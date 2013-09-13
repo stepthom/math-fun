@@ -16,6 +16,10 @@ public class EasyMain {
     @Option(name="-d", usage="Print differentials too.")
     public boolean isPrintDifferential = false;
 
+
+    @Option(name="-f", usage="Experiment with Fractions.")
+    public boolean isFractions = false;
+
     protected void parse_input(String[] args) {
 
         CmdLineParser parser = new CmdLineParser(this);
@@ -44,6 +48,31 @@ public class EasyMain {
             System.out.print("\n");
     }
 
+    protected int createInt(boolean coefficient) {
+        int i = (int)(Math.random() * 100);
+        if (coefficient) {
+            i -= 50;
+        }
+        return i;
+    }
+
+    protected Fraction createFraction(boolean coefficient) {
+        int n = createInt(coefficient);
+        int d = 1;
+        if (this.isFractions) {
+            d  = createInt(coefficient);
+        }
+
+        return new Fraction(n, d);
+    }
+
+    protected Term createTerm() {
+        Fraction coefficient = createFraction(true);
+        Fraction exponent = createFraction(false);
+
+        return new Term(coefficient, exponent);
+    }
+
     // The main logic loop
     public void run() {
         for (int i=0; i<this.numMathFunctions;++i){
@@ -52,9 +81,7 @@ public class EasyMain {
             int numTerms = 1 + (int)(Math.random() * 5);
 
             for (int j = 0; j<numTerms; ++j){
-                int coefficient = (int)(Math.random() * 100) - 50;
-                int exponent = (int)(Math.random() * 100);
-                Term t = new Term(coefficient, exponent);
+                Term t = createTerm();
                 mf.addTerm(t);
             }
 
