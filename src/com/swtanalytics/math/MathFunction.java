@@ -17,8 +17,11 @@ public class MathFunction {
 	
 	public String toString(){
 		String result = "f(x) = ";
+        boolean first_term = true;
 		for (Term t: terms){
-			result += (t + " ");
+
+			result += (t.prettyPrint(first_term) + " ");
+            first_term = false;
 		}
 		return result;
 	}
