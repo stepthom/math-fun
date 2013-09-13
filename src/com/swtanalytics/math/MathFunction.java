@@ -27,6 +27,21 @@ public class MathFunction {
 		}
 		return result;
 	}
-	
-	
+
+    public MathFunction differentiate() {
+        MathFunction df = new MathFunction();
+        for (Term t: terms) {
+
+            if (t.exponent == 0) {
+                // Skip creating 0 constant terms.
+                continue;
+            }
+            // XXX This will make uncollapsed x^0 and x^1 terms in the
+            //     Style of the original class.
+            Term dt = new Term(t.coefficient*t.exponent, t.exponent-1);
+            df.addTerm(dt);
+        }
+
+        return df;
+    }
 }
