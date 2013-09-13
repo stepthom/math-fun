@@ -28,7 +28,8 @@ public class Term implements Comparable<Term> {
     }
 	
 	public String toString(){
-		return String.format("%+dx^%d", this.coefficient, this.exponent);
+        String exp = this.exponent.formatString(true);
+		return String.format("%sx^%s", this.coefficient, exp);
 	}
 
     public int compareTo(Term t) {
