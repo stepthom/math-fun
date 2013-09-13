@@ -17,10 +17,12 @@ public class Fraction {
             n *= -1;
         }
 
-        String result = String.format("%+dx", n);
+        String result = String.format("%+d", n);
 
-        // TODO: Collapse into integer?
-        result = String.format("%s/%dx", result, d);
+        // Collapse into integer
+        if (d != 1) {
+            result = String.format("%s/%d", result, d);
+        }
 
         return result;
     }
