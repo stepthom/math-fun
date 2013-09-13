@@ -5,8 +5,6 @@
     <property name="lib"         location="./lib"/>
     <property name="build"       location="./build"/>
     <property name="dist"        location="./dist"/>
-    <property name="logs"        location="./logs"/>
-    <property name="scripts"     location="./scripts"/>
     <property name="jar"         location="${dist}/math-fun.jar"/>
 
     <!-- Default list of jars to include -->
@@ -23,27 +21,16 @@
         <delete dir="${dist}"/>
     </target>
 
-    <!-- Delete ALL the generated directories -->
-    <target name="clean-all" depends="clean">
-        <delete dir="${docs}"/>
-        <delete dir="${logs}"/>
-        <delete dir="${reports}"/>
-    </target>
-
     <!-- Target to create the temporary directories -->
     <target name="init">
         <tstamp/>
         <mkdir dir="${build}"/>
         <mkdir dir="${dist}"/>
-        <mkdir dir="${logs}"/>
-        <mkdir dir="${reports}"/>
-
     </target>
 
     <!-- Compile the code -->
     <target name="compile" depends="init">
         <echo message="Compiling java:"/>
-
         <javac srcdir="${src}" destdir="${build}" debug="on" includeantruntime="false">
         </javac>
     </target>
@@ -67,10 +54,6 @@
          only with a few additional items. So if you change this task, be sure
          to update the "test-coverage" task, too. -->
     <target name="test" depends="clean,jar">
-        <!-- First make sure the trace DB is running and cleared. -->
-        <exec dir="." executable="${startScript}" os="Linux" failonerror="true">
-            <arg value="-C"/>
-        </exec>
         <junit showoutput="true" haltonfailure="true" fork="true">
             <classpath >
                 <fileset dir="${dist}">
