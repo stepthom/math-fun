@@ -3,7 +3,7 @@ math-fun
 
 Just testing out some fun with mathematics.
 
-Initially, the goal of this package will be to randomly generate a set of
+Initially, the goal of this package will be to randomly generate (and print to stdout) a set of
 functions of the form:
 
 ```
