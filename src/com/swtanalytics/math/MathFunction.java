@@ -38,7 +38,7 @@ public class MathFunction {
             }
             // XXX This will make uncollapsed x^0 and x^1 terms in the
             //     Style of the original class.
-            Term dt = new Term(t.coefficient*t.exponent, t.exponent-1);
+            Term dt = new Term(t.coefficient.multiply(t.exponent), t.exponent.subtract(new Fraction(1,1)));
             df.addTerm(dt);
         }
 

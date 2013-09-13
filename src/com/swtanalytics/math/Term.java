@@ -1,11 +1,11 @@
 package com.swtanalytics.math;
 
 public class Term implements Comparable<Term> {
+
+	protected Fraction coefficient;
+	protected Fraction exponent;
 	
-	protected int coefficient;
-	protected int exponent;
-	
-	public Term (int c, int e){
+	public Term (Fraction c, Fraction e){
 		this.coefficient = c;
 		this.exponent = e;
 	}
@@ -32,7 +32,8 @@ public class Term implements Comparable<Term> {
 	}
 
     public int compareTo(Term t) {
-        return this.exponent - t.exponent;
+        return this.exponent.compareTo(t.exponent);
     }
 
 }
+
