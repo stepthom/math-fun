@@ -1,6 +1,6 @@
 package com.swtanalytics.math;
 
-public class Term {
+public class Term implements Comparable<Term> {
 	
 	protected int coefficient;
 	protected int exponent;
@@ -24,12 +24,15 @@ public class Term {
                     result = result.substring(1, result.lenght());
             }
 */
-
             return result;
     }
 	
 	public String toString(){
 		return String.format("%+dx^%d", this.coefficient, this.exponent);
 	}
+
+    public int compareTo(Term t) {
+        return this.exponent - t.exponent;
+    }
 
 }
