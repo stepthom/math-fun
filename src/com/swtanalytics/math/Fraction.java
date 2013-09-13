@@ -27,6 +27,30 @@ public class Fraction {
         return result;
     }
 
+    public String formatString(boolean stripPositive) {
+        int n = this.numerator;
+        int d = Math.abs(this.denominator);
+        if (this.denominator < 0) {
+            n *= -1;
+        }
+
+        
+        String fmt;
+        if (stripPositive) {
+            fmt = "%d";
+        } else {
+            fmt = "%+d";
+        }
+        String result = String.format(fmt, n);
+
+        // Collapse into integer
+        if (d != 1) {
+            result = String.format("%s/%d", result, d);
+        }
+
+        return result;
+    }
+
     public int doubleValue() {
         return this.numerator / this.denominator;
     }
