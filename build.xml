@@ -32,6 +32,7 @@
     <target name="compile" depends="init">
         <echo message="Compiling java:"/>
         <javac srcdir="${src}" destdir="${build}" debug="on" includeantruntime="false">
+            <classpath refid="dep.runtime" />
         </javac>
     </target>
 
@@ -40,10 +41,14 @@
          instead, dynamically build the classpath (with the manifestclasspath
          task) and adjust the jar's manifest accordingly. -->
     <target name="jar" depends="compile">
+        <manifestclasspath property="manifest_cp" jarfile="${jar}">
+                <classpath refid="dep.runtime" />
+        </manifestclasspath>
 
         <jar jarfile="${jar}" basedir="${build}">
             <manifest>
                 <attribute name="Main-Class" value="com.swtanalytics.math.EasyMain"/>
+                <attribute name="Class-Path" value="${manifest_cp}"/>
             </manifest>
         </jar>
     </target>
