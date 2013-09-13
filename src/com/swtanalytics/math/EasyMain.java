@@ -18,10 +18,10 @@ public class EasyMain {
         CmdLineParser parser = new CmdLineParser(this);
         try {
             parser.parseArgument(args);
+            // validate the input a bit.
+            // There's probably a nicer way to do this with args4j
             if (this.numMathFunctions <= 0) {
                 throw new CmdLineException("Option -n requires a positive integer");
-                //System.out.print("-n must be a positive integer\n");
-                //return;
             }
 
         } catch (CmdLineException e) {
@@ -32,10 +32,8 @@ public class EasyMain {
         }
     }
 
-    public void run(String[] args) {
-
-        this.parse_input(args);
-
+    // The main logic loop
+    public void run() {
         for (int i=0; i<this.numMathFunctions;++i){
             MathFunction mf = new MathFunction();
 
@@ -56,7 +54,8 @@ public class EasyMain {
 
     public static void main(String[] args) throws IOException {
         EasyMain main = new EasyMain();
-        main.run(args);
+        main.parse_input(args);
+        main.run();
     }
 
 }
