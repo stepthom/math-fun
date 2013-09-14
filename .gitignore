@@ -1,12 +1,9 @@
 *.class
 
-# Package Files #
-*.jar
-*.war
-*.ear
 
 # Temporary dirs #
 .classpath
 .project
 bin
 build
+dist
