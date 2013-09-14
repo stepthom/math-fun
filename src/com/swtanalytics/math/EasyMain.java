@@ -61,6 +61,9 @@ public class EasyMain {
         int d = 1;
         if (this.isFractions) {
             d  = createInt(coefficient);
+            if (d == 0) {
+                d = 1;
+            }
         }
 
         return new Fraction(n, d);

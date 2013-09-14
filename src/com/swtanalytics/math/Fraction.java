@@ -7,6 +7,9 @@ public class Fraction {
 
     public Fraction(int n, int d) {
         this.numerator = n;
+        if (d == 0) {
+            throw new IllegalArgumentException("Argument 'd' is 0");
+        }
         this.denominator = d;
     }
 
@@ -34,7 +37,6 @@ public class Fraction {
             n *= -1;
         }
 
-        
         String fmt;
         if (stripPositive) {
             fmt = "%d";
