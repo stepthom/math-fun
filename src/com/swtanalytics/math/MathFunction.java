@@ -32,14 +32,19 @@ public class MathFunction {
         MathFunction df = new MathFunction();
         for (Term t: terms) {
 
-            if (t.exponent.numerator == 0) {
-                // Skip creating 0 constant terms.
-                continue;
-            }
             // XXX This will make uncollapsed x^0 and x^1 terms in the
             //     Style of the original class.
-            Fraction c = t.coefficient.multiply(t.exponent);
-            Fraction e = t.exponent.subtract(new Fraction(1,1));
+            Fraction c;
+            Fraction e;
+            if (t.exponent.numerator == 0) {
+                // Leave the zero terms in case its the only one.
+                c = new Fraction(0, 1);
+                e = new Fraction(0, 1);
+            }
+            else {
+               c = t.coefficient.multiply(t.exponent);
+               e = t.exponent.subtract(new Fraction(1,1));
+            }
             Term dt = new Term(c, e);
             df.addTerm(dt);
         }
