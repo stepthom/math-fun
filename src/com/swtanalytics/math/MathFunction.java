@@ -1,6 +1,7 @@
 package com.swtanalytics.math;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class MathFunction {
 
@@ -12,6 +13,7 @@ public class MathFunction {
 	
 	public void addTerm(Term t){
 		terms.add(t);
+        Collections.sort(this.terms);
 	}
 	
 	
