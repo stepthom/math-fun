@@ -13,6 +13,9 @@ public class EasyMain {
     public int numMathFunctions = NUM_MATH_FUNCTIONS_DEFAULT;
 
 
+    @Option(name="-d", usage="Print differentials too.")
+    public boolean isPrintDifferential = false;
+
     protected void parse_input(String[] args) {
 
         CmdLineParser parser = new CmdLineParser(this);
@@ -32,6 +35,15 @@ public class EasyMain {
         }
     }
 
+    public void printFunction(MathFunction mf, int i, boolean diff) {
+            if (diff) {
+                System.out.print("Differential ");
+            }
+            System.out.printf("Function %d:\n", i);
+            System.out.print(mf);
+            System.out.print("\n");
+    }
+
     // The main logic loop
     public void run() {
         for (int i=0; i<this.numMathFunctions;++i){
@@ -46,9 +58,11 @@ public class EasyMain {
                 mf.addTerm(t);
             }
 
-            System.out.printf("Function %d:\n", i);
-            System.out.print(mf);
-            System.out.print("\n");
+            printFunction(mf, i, false);
+
+            if (this.isPrintDifferential) {
+                printFunction(mf.differentiate(), i, true);
+            }
         }
     }
 
