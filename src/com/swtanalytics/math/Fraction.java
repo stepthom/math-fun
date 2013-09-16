@@ -58,7 +58,7 @@ public class Fraction {
     }
 
     public int compareTo(Fraction f) {
-        Double result = new Double(this.doubleValue() - f.doubleValue());
+        Double result = new Double(f.doubleValue() - this.doubleValue());
         return result.intValue();
     }
 
