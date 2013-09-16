@@ -34,14 +34,16 @@ public class MathFunction {
 
             // XXX This will make uncollapsed x^0 and x^1 terms in the
             //     Style of the original class.
-            int c;
-            int e;
-            if (t.exponent == 0) {
-                c = 0;
-                e = 0;
-            } else {
-                c = t.coefficient*t.exponent;
-                e = t.exponent-1;
+            Fraction c;
+            Fraction e;
+            if (t.exponent.numerator == 0) {
+                // Leave the zero terms in case its the only one.
+                c = new Fraction(0, 1);
+                e = new Fraction(0, 1);
+            }
+            else {
+               c = t.coefficient.multiply(t.exponent);
+               e = t.exponent.subtract(new Fraction(1,1));
             }
             Term dt = new Term(c, e);
             df.addTerm(dt);
