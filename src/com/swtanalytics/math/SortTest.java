@@ -9,11 +9,12 @@ import org.junit.Assert;
 public class SortTest {
 
     Term[] TERMS = {
-        new Term(1,1),
-        new Term(1,2),
-        new Term(1,3),
-        new Term(1,4),
-        new Term(1,5),
+        new Term(new Fraction(1,1), new Fraction(1,1)),
+        new Term(new Fraction(1,1), new Fraction(2,1)),
+        new Term(new Fraction(1,1), new Fraction(3,1)),
+        new Term(new Fraction(1,1), new Fraction(4,1)),
+        new Term(new Fraction(1,1), new Fraction(5,1)),
+        new Term(new Fraction(1,1), new Fraction(6,1)),
     };
 
     static final String BAD_SORT_MSG = "Terms sorted incorrectly by MathFucntion";
@@ -29,13 +30,14 @@ public class SortTest {
 
         // Programatically run through the MathFunction and check to see
         // that each exponent is equal to or smaller than the last.
-        int lastExp = 0;
+        Fraction lastExp = null;
         boolean firstTerm = true;
         for (Term t : mf.terms) {
             if (firstTerm) {
                 firstTerm = false;
             } else {
-               Assert.assertTrue(BAD_SORT_MSG, lastExp >= t.exponent);
+               Assert.assertTrue(BAD_SORT_MSG,
+                                 lastExp.doubleValue() >= t.exponent.doubleValue());
             }
             lastExp = t.exponent;
         }
