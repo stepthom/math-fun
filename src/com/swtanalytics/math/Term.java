@@ -32,7 +32,7 @@ public class Term implements Comparable<Term> {
 	}
 
     public int compareTo(Term t) {
-        return this.exponent - t.exponent;
+        return t.exponent - this.exponent;
     }
 
 }
