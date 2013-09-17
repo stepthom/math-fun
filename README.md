@@ -32,7 +32,24 @@ Use
 ===
 
 ```
-java -jar dist/math-fun.jar
+java -jar dist/math-fun.jar [options]
+```
+
+where the options are:
+- `-n NUM`: The number of functions to randomly generate and display. (Default: 10)
+- `-d`: Print the deriviate of each function, too. (Default: off)
+- `-f`: Generate fractional coefficients and exponents. (Default: off)
+
+
+
+
+Test
+====
+
+To run the JUnit tests:
+
+```
+ant test
 ```
 
 
