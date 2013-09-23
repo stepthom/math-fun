@@ -56,22 +56,24 @@ public class EasyMain {
         return i;
     }
 
-    protected Fraction createFraction(boolean coefficient) {
+    protected Fraction createFraction(boolean coefficient, double wholeProb) {
         int n = createInt(coefficient);
         int d = 1;
         if (this.isFractions) {
-            d  = createInt(coefficient);
-            if (d == 0) {
-                d = 1;
-            }
+	    if (Math.random() > wholeProb) {
+		d  = createInt(coefficient);
+		if (d == 0) {
+		    d = 1;
+		}
+	    }
         }
 
         return new Fraction(n, d);
     }
 
     protected Term createTerm() {
-        Fraction coefficient = createFraction(true);
-        Fraction exponent = createFraction(false);
+        Fraction coefficient = createFraction(true, 0.75);
+        Fraction exponent = createFraction(false, 0.25);
 
         return new Term(coefficient, exponent);
     }
