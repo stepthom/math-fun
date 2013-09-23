@@ -73,7 +73,7 @@ public class EasyMain {
 
     protected Term createTerm() {
         Fraction coefficient = createFraction(true, 0.75);
-        Fraction exponent = createFraction(false, 0.25);
+        Fraction exponent = createFraction(false, 0.95);
 
         return new Term(coefficient, exponent);
     }
