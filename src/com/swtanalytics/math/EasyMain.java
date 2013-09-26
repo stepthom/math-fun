@@ -45,6 +45,7 @@ public class EasyMain {
     protected String getFunctionString(MathFunction mf, int i, boolean diff) {
     	StringBuilder functionString = new StringBuilder();
     	
+    	// If we're outputting xml, indent and omit the labels printed for the standard output format
     	if (outputXml) {
             functionString.append("    " + mf);
     	}
@@ -66,10 +67,8 @@ public class EasyMain {
     public void printFunction(MathFunction mf, int i, boolean diff) {
 
     	StringBuilder outputString = new StringBuilder();
-
-    	// For clarity, indent if we're outputting xml
-    	boolean indent = outputXml;
     	
+    	// Decorate with xml if xml output was specified
     	if (outputXml) {
     		if (diff) {
     			outputString.append("  <derivative>");
@@ -83,6 +82,7 @@ public class EasyMain {
     	
     	outputString.append(getFunctionString(mf, i, diff));
 
+    	// Decorate with xml if xml output was specified
     	if (outputXml) {
     		if (diff) {
     			outputString.append("  </derivative>");
