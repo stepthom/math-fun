@@ -47,7 +47,7 @@ public class EasyMain {
     	
     	// If we're outputting xml, indent and omit the labels printed for the standard output format
     	if (outputXml) {
-            functionString.append("    " + mf);
+            functionString.append("      " + mf);
     	}
     	else
     	{
@@ -64,20 +64,35 @@ public class EasyMain {
         return functionString.toString();
     }
 
-    public void printFunction(MathFunction mf, int i, boolean diff) {
+    public void printFunction(MathFunction mf, int i)
+    {
+    	if (outputXml) {
+    		System.out.println("  <function>");
+    	}
+
+    	printFunction(mf, i, false);
+
+        if (this.isPrintDifferential) {
+            printFunction(mf.differentiate(), i, true);
+        }
+
+    	if (outputXml) {
+    		System.out.println("  </function>");
+    	}
+    }
+
+    protected void printFunction(MathFunction mf, int i, boolean diff) {
 
     	StringBuilder outputString = new StringBuilder();
     	
     	// Decorate with xml if xml output was specified
     	if (outputXml) {
     		if (diff) {
-    			outputString.append("  <derivative>");
+    			outputString.append("    <derivative>\n");
     		}
     		else {
-    			outputString.append("  <output>");
+    			outputString.append("    <output>\n");
     		}
-    		
-    		outputString.append("\n");
     	}
     	
     	outputString.append(getFunctionString(mf, i, diff));
@@ -85,13 +100,11 @@ public class EasyMain {
     	// Decorate with xml if xml output was specified
     	if (outputXml) {
     		if (diff) {
-    			outputString.append("  </derivative>");
+    			outputString.append("    </derivative>\n");
     		}
     		else {
-    			outputString.append("  </output>");
+    			outputString.append("    </output>\n");
     		}
-    		
-    		outputString.append("\n");
     	}
     	
     	System.out.print(outputString.toString());
@@ -143,11 +156,7 @@ public class EasyMain {
                 mf.addTerm(t);
             }
 
-            printFunction(mf, i, false);
-
-            if (this.isPrintDifferential) {
-                printFunction(mf.differentiate(), i, true);
-            }
+            printFunction(mf, i);
         }
 
     	if (outputXml)
