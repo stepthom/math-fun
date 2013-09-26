@@ -20,6 +20,9 @@ public class EasyMain {
     @Option(name="-f", usage="Experiment with Fractions.")
     public boolean isFractions = false;
 
+    @Option(name="-x", usage="Format output as XML.")
+    public boolean outputXml = false;
+    
     protected void parse_input(String[] args) {
 
         CmdLineParser parser = new CmdLineParser(this);
@@ -39,13 +42,72 @@ public class EasyMain {
         }
     }
 
-    public void printFunction(MathFunction mf, int i, boolean diff) {
-            if (diff) {
-                System.out.print("Differential ");
+    protected String getFunctionString(MathFunction mf, int i, boolean diff) {
+    	StringBuilder functionString = new StringBuilder();
+    	
+    	// If we're outputting xml, indent and omit the labels printed for the standard output format
+    	if (outputXml) {
+            functionString.append("      " + mf);
+    	}
+    	else
+    	{
+        	if (diff) {
+                functionString.append("Differential ");
             }
-            System.out.printf("Function %d:\n", i);
-            System.out.print(mf);
-            System.out.print("\n");
+    		
+            functionString.append(String.format("Function %d:\n", i));
+            functionString.append(mf);
+    	}
+
+        functionString.append("\n");
+
+        return functionString.toString();
+    }
+
+    public void printFunction(MathFunction mf, int i)
+    {
+    	if (outputXml) {
+    		System.out.println("  <function>");
+    	}
+
+    	printFunction(mf, i, false);
+
+        if (this.isPrintDifferential) {
+            printFunction(mf.differentiate(), i, true);
+        }
+
+    	if (outputXml) {
+    		System.out.println("  </function>");
+    	}
+    }
+
+    protected void printFunction(MathFunction mf, int i, boolean diff) {
+
+    	StringBuilder outputString = new StringBuilder();
+    	
+    	// Decorate with xml if xml output was specified
+    	if (outputXml) {
+    		if (diff) {
+    			outputString.append("    <derivative>\n");
+    		}
+    		else {
+    			outputString.append("    <output>\n");
+    		}
+    	}
+    	
+    	outputString.append(getFunctionString(mf, i, diff));
+
+    	// Decorate with xml if xml output was specified
+    	if (outputXml) {
+    		if (diff) {
+    			outputString.append("    </derivative>\n");
+    		}
+    		else {
+    			outputString.append("    </output>\n");
+    		}
+    	}
+    	
+    	System.out.print(outputString.toString());
     }
 
     protected int createInt(boolean coefficient) {
@@ -80,7 +142,13 @@ public class EasyMain {
 
     // The main logic loop
     public void run() {
-        for (int i=0; i<this.numMathFunctions;++i){
+    	
+    	if (outputXml)
+    	{
+    		System.out.println("<functions>");
+    	}
+
+    	for (int i=0; i<this.numMathFunctions;++i){
             MathFunction mf = new MathFunction();
 
             int numTerms = 1 + (int)(Math.random() * 5);
@@ -90,12 +158,13 @@ public class EasyMain {
                 mf.addTerm(t);
             }
 
-            printFunction(mf, i, false);
-
-            if (this.isPrintDifferential) {
-                printFunction(mf.differentiate(), i, true);
-            }
+            printFunction(mf, i);
         }
+
+    	if (outputXml)
+    	{
+    		System.out.println("</functions>");
+    	}
     }
 
     public static void main(String[] args) throws IOException {
