@@ -64,7 +64,7 @@ public class Fraction {
 
     public Fraction subtract(Fraction f) {
         int n = this.numerator*f.denominator - f.numerator*this.denominator;
-        int d = this.numerator*f.denominator;
+	int d = this.denominator*f.denominator;
         return new Fraction(n, d);
     }
 
