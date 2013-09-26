@@ -13,21 +13,11 @@ public class Fraction {
         this.denominator = d;
     }
 
+    // This was a complete duplicate of formatString minus the stripPositive functionality
+    // Refactored it to reuse formatString and assume no stripping
     public String toString() {
-        int n = this.numerator;
-        int d = Math.abs(this.denominator);
-        if (this.denominator < 0) {
-            n *= -1;
-        }
-
-        String result = String.format("%+d", n);
-
-        // Collapse into integer
-        if (d != 1) {
-            result = String.format("%s/%d", result, d);
-        }
-
-        return result;
+    	// Calling this will not strip the sign from a positive numerator
+    	return formatString(false);
     }
 
     public String formatString(boolean stripPositive) {
