@@ -62,5 +62,33 @@ public class Fraction {
         return new Fraction(this.numerator*f.numerator,
                             this.denominator*f.denominator);
     }
+
+    public Fraction simplify() {
+	int n = this.numerator;
+	int d = this.denominator;
+
+	int g = gcf(n, d);
+	n = n / g;
+	d = d / g;
+
+	return new Fraction(n, d);
+    }
+
+    private int gcf(int a,int b)
+    {
+        int rem = 0;
+        int gcf = 0;
+        do {
+	    rem = a % b;
+	    if (rem == 0)
+		gcf = b;
+	    else {
+		a = b;
+		b = rem;
+	    }
+	} while (rem != 0);
+
+        return gcf;
+    }
 }
 
