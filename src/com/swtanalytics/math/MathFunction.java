@@ -5,28 +5,28 @@ import java.util.Collections;
 
 public class MathFunction {
 
-	protected ArrayList<Term> terms = new ArrayList<Term>();
+    protected ArrayList<Term> terms = new ArrayList<Term>();
 	
-	public MathFunction(){
+    public MathFunction(){
 		
-	}
+    }
 	
-	public void addTerm(Term t){
-		terms.add(t);
+    public void addTerm(Term t){
+	terms.add(t);
         Collections.sort(this.terms);
-	}
+    }
 	
 	
-	public String toString(){
-		String result = "f(x) = ";
+    public String toString(){
+	String result = "f(x) = ";
         boolean first_term = true;
-		for (Term t: terms){
+	for (Term t: terms){
 
-			result += (t.prettyPrint(first_term) + " ");
+	    result += (t.prettyPrint(first_term) + " ");
             first_term = false;
-		}
-		return result;
 	}
+	return result;
+    }
 
     public MathFunction differentiate() {
         MathFunction df = new MathFunction();
@@ -42,8 +42,8 @@ public class MathFunction {
                 e = new Fraction(0, 1);
             }
             else {
-               c = t.coefficient.multiply(t.exponent);
-               e = t.exponent.subtract(new Fraction(1,1));
+		c = t.coefficient.multiply(t.exponent);
+		e = t.exponent.subtract(new Fraction(1,1));
             }
             Term dt = new Term(c, e);
             df.addTerm(dt);
