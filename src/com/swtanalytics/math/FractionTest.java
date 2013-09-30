@@ -44,34 +44,22 @@ public class FractionTest {
 	
 	String BAD_SIMPLIFY_MSG = "Fraction simplified incorrectly.";
 
- 	Assert.assertEquals(BAD_SIMPLIFY_MSG, zero.simplify().doubleValue(), zero.doubleValue(), 0.0);
- 	Assert.assertEquals(BAD_SIMPLIFY_MSG, third.simplify().doubleValue(), third.doubleValue(), 0.0);
- 	Assert.assertEquals(BAD_SIMPLIFY_MSG, seven.simplify().doubleValue(), seven.doubleValue(), 0.0);
- 	Assert.assertEquals(BAD_SIMPLIFY_MSG, minusfourth.simplify().doubleValue(), minusfourth.doubleValue(), 0.0);
- 	Assert.assertEquals(BAD_SIMPLIFY_MSG, minusminus.simplify().doubleValue(), minusminus.doubleValue(), 0.0);
-
-  	Fraction f = zero.simplify();
-   	Assert.assertEquals(BAD_SIMPLIFY_MSG, f.numerator, 0);
+   	Assert.assertEquals(BAD_SIMPLIFY_MSG, zero.numerator, 0);
  
-   	f = third.simplify();
-   	Assert.assertEquals(BAD_SIMPLIFY_MSG, f.numerator, 1);
-   	Assert.assertEquals(BAD_SIMPLIFY_MSG, f.denominator, 3);
+   	Assert.assertEquals(BAD_SIMPLIFY_MSG, third.numerator, 1);
+   	Assert.assertEquals(BAD_SIMPLIFY_MSG, third.denominator, 3);
  
-   	f = seven.simplify();
-   	Assert.assertEquals(BAD_SIMPLIFY_MSG, f.numerator, 7);
-   	Assert.assertEquals(BAD_SIMPLIFY_MSG, f.denominator, 1);
+   	Assert.assertEquals(BAD_SIMPLIFY_MSG, seven.numerator, 7);
+   	Assert.assertEquals(BAD_SIMPLIFY_MSG, seven.denominator, 1);
  
- 	f = minusfourth.simplify();
-    	Assert.assertEquals(BAD_SIMPLIFY_MSG, f.numerator, 1);
-   	Assert.assertEquals(BAD_SIMPLIFY_MSG, f.denominator, -4);
+    	Assert.assertEquals(BAD_SIMPLIFY_MSG, minusfourth.numerator, -1);
+   	Assert.assertEquals(BAD_SIMPLIFY_MSG, minusfourth.denominator, 4);
 
-  	f = same.simplify();
-  	Assert.assertEquals(BAD_SIMPLIFY_MSG, f.numerator, -11);
-  	Assert.assertEquals(BAD_SIMPLIFY_MSG, f.denominator, 12);
+  	Assert.assertEquals(BAD_SIMPLIFY_MSG, same.numerator, -11);
+  	Assert.assertEquals(BAD_SIMPLIFY_MSG, same.denominator, 12);
 
-  	f = minusminus.simplify();
-  	Assert.assertEquals(BAD_SIMPLIFY_MSG, f.numerator, 4);
-  	Assert.assertEquals(BAD_SIMPLIFY_MSG, f.denominator, 1);
+  	Assert.assertEquals(BAD_SIMPLIFY_MSG, minusminus.numerator, 4);
+  	Assert.assertEquals(BAD_SIMPLIFY_MSG, minusminus.denominator, 1);
     }
     
 }
