@@ -43,8 +43,8 @@ public class Fraction {
         return result;
     }
 
-    public int doubleValue() {
-        return this.numerator / this.denominator;
+    public double doubleValue() {
+        return new Double(this.numerator) / this.denominator;
     }
 
     public int compareTo(Fraction f) {
