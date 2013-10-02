@@ -51,4 +51,15 @@ public class MathFunction {
 
         return df;
     }
+
+    public double evaluate(double value) {
+    	double returnValue = 0d;
+    	
+    	for (Term term : terms)
+    	{
+    		returnValue += term.evaluate(value);
+    	}
+    	
+    	return returnValue;
+    }
 }
