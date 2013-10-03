@@ -51,6 +51,20 @@ public class MathFunction {
 
         return df;
     }
+    
+    public MathFunction integrate() {
+    	MathFunction integral = new MathFunction();
+    	
+    	for (Term t : terms) {
+    		Fraction exp = new Fraction(t.exponent.numerator + t.exponent.denominator, t.exponent.denominator);
+    		Fraction coef = t.coefficient.multiply(new Fraction(exp.denominator, exp.numerator));
+    		
+    		Term integralTerm = new Term(coef, exp);
+    		integral.addTerm(integralTerm);
+    	}
+    	
+    	return integral;
+    }
 
     public double evaluate(double value) {
     	double returnValue = 0d;
