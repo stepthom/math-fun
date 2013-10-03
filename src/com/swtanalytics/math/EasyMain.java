@@ -8,6 +8,13 @@ import org.kohsuke.args4j.CmdLineException;
 public class EasyMain {
 
     public static final int NUM_MATH_FUNCTIONS_DEFAULT = 10;
+    
+    protected enum FunctionType
+    {
+    	NORMAL,
+    	DIFFERENTIAL,
+    	INTEGRAL
+    };
 
     @Option(name="-n", usage="The number of functions to generate.")
     public int numMathFunctions = NUM_MATH_FUNCTIONS_DEFAULT;
@@ -23,6 +30,9 @@ public class EasyMain {
     @Option(name="-x", usage="Format output as XML.")
     public boolean outputXml = false;
     
+    @Option(name="-i", usage="Print integrals too.")
+    public boolean isPrintIntegral = false;
+
     protected void parse_input(String[] args) {
 
         CmdLineParser parser = new CmdLineParser(this);
@@ -42,7 +52,7 @@ public class EasyMain {
         }
     }
 
-    protected String getFunctionString(MathFunction mf, int i, boolean diff) {
+    protected String getFunctionString(MathFunction mf, int i, FunctionType type) {
     	StringBuilder functionString = new StringBuilder();
     	
     	// If we're outputting xml, indent and omit the labels printed for the standard output format
@@ -51,12 +61,19 @@ public class EasyMain {
     	}
     	else
     	{
-        	if (diff) {
+        	if (type == FunctionType.DIFFERENTIAL) {
                 functionString.append("Differential ");
+            }
+        	else if (type == FunctionType.INTEGRAL) {
+                functionString.append("Integral ");
             }
     		
             functionString.append(String.format("Function %d:\n", i));
             functionString.append(mf);
+            
+            if (type == FunctionType.INTEGRAL) {
+            	functionString.append("+ constant");
+            }
     	}
 
         functionString.append("\n");
@@ -70,40 +87,54 @@ public class EasyMain {
     		System.out.println("  <function>");
     	}
 
-    	printFunction(mf, i, false);
+    	printFunction(mf, i, FunctionType.NORMAL);
 
         if (this.isPrintDifferential) {
-            printFunction(mf.differentiate(), i, true);
+            printFunction(mf.differentiate(), i, FunctionType.DIFFERENTIAL);
         }
 
+        if (this.isPrintIntegral) {
+        	printFunction(mf.integrate(), i, FunctionType.INTEGRAL);
+        }
+        
     	if (outputXml) {
     		System.out.println("  </function>");
     	}
     }
 
-    protected void printFunction(MathFunction mf, int i, boolean diff) {
+    protected void printFunction(MathFunction mf, int i, FunctionType type) {
 
     	StringBuilder outputString = new StringBuilder();
     	
     	// Decorate with xml if xml output was specified
     	if (outputXml) {
-    		if (diff) {
-    			outputString.append("    <derivative>\n");
-    		}
-    		else {
-    			outputString.append("    <output>\n");
+    		switch (type) {
+	    		case NORMAL:
+	    			outputString.append("    <output>\n");
+	    			break;
+	    		case DIFFERENTIAL:
+	    			outputString.append("    <derivative>\n");
+	    			break;
+	    		case INTEGRAL:
+	    			outputString.append("    <integral>\n");
+	    			break;
     		}
     	}
     	
-    	outputString.append(getFunctionString(mf, i, diff));
+    	outputString.append(getFunctionString(mf, i, type));
 
     	// Decorate with xml if xml output was specified
     	if (outputXml) {
-    		if (diff) {
-    			outputString.append("    </derivative>\n");
-    		}
-    		else {
+    		switch (type) {
+    		case NORMAL:
     			outputString.append("    </output>\n");
+    			break;
+    		case DIFFERENTIAL:
+    			outputString.append("    </derivative>\n");
+    			break;
+    		case INTEGRAL:
+    			outputString.append("    </integral>\n");
+    			break;
     		}
     	}
     	
