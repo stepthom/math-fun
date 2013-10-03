@@ -10,11 +10,18 @@ public class Fraction {
             throw new IllegalArgumentException("Argument 'd' is 0");
         }
 
-	int g = gcf(n, d);
-	this.numerator = n / g;
-	this.denominator = d / g;
+    // Short circuit gcf if we have a 0 numerator
+    if (n != 0) {
+    	int g = gcf(n, d);
+    	this.numerator = n / g;
+    	this.denominator = d / g;
+    }
+    else {
+    	this.numerator = n;
+    	this.denominator = d;
+    }
 
-	// Fix the sign of the numerator and denominator if the gcf is
+    // Fix the sign of the numerator and denominator if the gcf is
 	// negative. We may only need to check and fix the denominator
 	// sign here...
 	if (this.numerator > 0 && this.denominator < 0) {
@@ -85,6 +92,8 @@ public class Fraction {
 
     private int gcf(int a,int b)
     {
+    	// TODO: In theory, gcf behavior should be undefined when one of the operands is 0.
+    	// Should this throw an error?
         int rem = 0;
         int gcf = 0;
         do {
