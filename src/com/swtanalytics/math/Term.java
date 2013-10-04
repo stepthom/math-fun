@@ -10,21 +10,15 @@ public class Term implements Comparable<Term> {
     }
 
     public String prettyPrint(boolean isFirstTerm) {
-        // If first term, strip the positive sign if present
-        String result = this.formatString(isFirstTerm);
-        if (!isFirstTerm) {
-            result = result.substring(0,1) + ' ' + result.substring(1, result.length());
-        }
-
-        return result;
+        return this.formatString(isFirstTerm);
     }
 
-    protected String formatString(boolean stripPositiveFromCoefficient) {
+    protected String formatString(boolean isFirstTerm) {
         if (this.coefficient.numerator == 0) {
             return "";
         }
 
-        String coefficientPart = formatCoefficientPart(stripPositiveFromCoefficient);
+        String coefficientPart = formatCoefficientPart(isFirstTerm);
         String variablePart = formatVariablePart();
 
         return coefficientPart + variablePart;
@@ -39,16 +33,16 @@ public class Term implements Comparable<Term> {
             variablePart = "x";
         }
         else {
-            variablePart = "x^" + this.exponent.formatString(true);
+            variablePart = "x^" + this.exponent.formatString(true, false);
         }
 
         return variablePart;
     }
 
-    private String formatCoefficientPart(boolean stripPositiveFromCoefficient) {
+    private String formatCoefficientPart(boolean isFirstTerm) {
         return this.coefficient.numerator == this.coefficient.denominator
                 ? ""
-                : this.coefficient.formatString(stripPositiveFromCoefficient);
+                : this.coefficient.formatString(isFirstTerm, !isFirstTerm);
     }
 
     public String toString() {

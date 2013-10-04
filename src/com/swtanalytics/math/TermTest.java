@@ -63,6 +63,34 @@ public class TermTest {
     }
 
     @Test
+    public void whenCoefficientIsOneAndIsNotFirstTermPrettyPrintIsVariablePartOnly() {
+        // Arrange
+        Fraction coefficient = new Fraction(1, 1);
+        Fraction exponent = new Fraction(2, 1);
+        Term term = new Term(coefficient, exponent);
+
+        // Act
+        String result = term.prettyPrint(false);
+
+        // Assert
+        Assert.assertEquals("x^2", result);
+    }
+
+    @Test
+    public void whenCoefficientIsZeroAndIsNotFirstTermPrettyPrintReturnsEmptyString() {
+        // Arrange
+        Fraction coefficient = new Fraction(0, 1);
+        Fraction exponent = new Fraction(2, 1);
+        Term term = new Term(coefficient, exponent);
+
+        // Act
+        String result = term.prettyPrint(false);
+
+        // Assert
+        Assert.assertEquals("", result);
+    }
+
+    @Test
     public void whenCoefficientReducesToOnePrettyPrintIsVariablePartOnly() {
         // Arrange
         Fraction coefficient = new Fraction(37, 37);
