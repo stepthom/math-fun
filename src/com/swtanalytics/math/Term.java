@@ -9,33 +9,46 @@ public class Term implements Comparable<Term> {
 		this.coefficient = c;
 		this.exponent = e;
 	}
-
     public String prettyPrint(boolean isFirstTerm) {
-            // Not smart about string construction. Just dumb manipulation
-    	    // TODO: consider short-circuiting printing of this term entirely when it is 0
-    	    // ex: 0/48x^74/8 = 0 so maybe don't print it?
-
-    	    // If first term, strip the positive
-    		boolean stripPositiveFromCoefficient = isFirstTerm;
-            String result = this.formatString(stripPositiveFromCoefficient);
-            if (!isFirstTerm){
-                result = result.substring(0,1) + ' '
-                         + result.substring(1, result.length());
-            }
-            
-            return result;
+        return this.formatString(isFirstTerm);
     }
-	
-    protected String formatString(boolean stripPositiveFromCoefficient) {
-		String coef = this.coefficient.formatString(stripPositiveFromCoefficient);
-        String exp = this.exponent.formatString(true);
-		return String.format("%sx^%s", coef, exp);
+
+    protected String formatString(boolean isFirstTerm) {
+        if (this.coefficient.numerator == 0) {
+            return "";
+        }
+
+        String coefficientPart = formatCoefficientPart(isFirstTerm);
+        String variablePart = formatVariablePart();
+
+        return coefficientPart + variablePart;
+    }
+
+    private String formatVariablePart() {
+        String variablePart;
+        if (this.exponent.numerator == 0) {
+            variablePart = "";
+        }
+        else if (this.exponent.numerator == this.exponent.denominator) {
+            variablePart = "x";
+        }
+        else {
+            variablePart = "x^" + this.exponent.formatString(true, false);
+        }
+
+        return variablePart;
+    }
+
+    private String formatCoefficientPart(boolean isFirstTerm) {
+        return this.coefficient.numerator == this.coefficient.denominator
+                ? ""
+                : this.coefficient.formatString(isFirstTerm, !isFirstTerm);
     }
 
     public String toString() {
-    	// Calling this will not strip the sign from a positive coefficient
-    	return formatString(false);
-	}
+        // Calling this will not strip the sign from a positive coefficient
+        return formatString(false);
+    }
 
     public int compareTo(Term t) {
         return this.exponent.compareTo(t.exponent);
@@ -48,5 +61,12 @@ public class Term implements Comparable<Term> {
 
     	return returnValue;
     }
-}
 
+    public Term add(Term toAdd) {
+        if (!exponent.equals(toAdd.exponent)) {
+            throw new IllegalArgumentException("Exponents must match in order to add terms.");
+        }
+
+        return new Term(coefficient.add(toAdd.coefficient), toAdd.exponent);
+    }
+}
