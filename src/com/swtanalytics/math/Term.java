@@ -53,9 +53,9 @@ public class Term implements Comparable<Term> {
     public int compareTo(Term t) {
         return this.exponent.compareTo(t.exponent);
     }
-}
+
     public double evaluate(double value) {
-    	double returnValue = 0d;
+    	double returnValue;
     	
     	returnValue = Math.pow(value, exponent.doubleValue()) * coefficient.doubleValue();
 
