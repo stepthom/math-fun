@@ -67,6 +67,7 @@ public class Fraction {
         } else {
             numeratorPart = String.format("%s%d", sign, Math.abs(n));
         }
+        String result = String.format(fmt, n);
 
         // Collapse into integer
         if (d != 1) {
@@ -77,11 +78,11 @@ public class Fraction {
     }
 
     public double doubleValue() {
-        return (double) this.numerator / this.denominator;
+        return new Double(this.numerator) / this.denominator;
     }
 
     public int compareTo(Fraction f) {
-        Double result = f.doubleValue() - this.doubleValue();
+        Double result = (double) (f.doubleValue() - this.doubleValue());
         return result.intValue();
     }
 
