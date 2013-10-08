@@ -4,6 +4,9 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class IntegrationTest {
 
 	@Test
@@ -17,8 +20,10 @@ public class IntegrationTest {
 		function.addTerm(t1);
 		
 		MathFunction integral = function.integrate();
-		Fraction integralCoefficient = integral.terms.get(0).coefficient;
-		Fraction integralExponent = integral.terms.get(0).exponent;
+
+        List<Term> terms = new ArrayList<Term>(integral.getTerms());
+        Fraction integralCoefficient = terms.get(0).coefficient;
+		Fraction integralExponent = terms.get(0).exponent;
 		
 		assertTrue(integralCoefficient.numerator == 4);
 		assertTrue(integralCoefficient.denominator == 3);
@@ -37,8 +42,10 @@ public class IntegrationTest {
 		function.addTerm(t1);
 		
 		MathFunction integral = function.integrate();
-		Fraction integralCoefficient = integral.terms.get(0).coefficient;
-		Fraction integralExponent = integral.terms.get(0).exponent;
+
+        List<Term> terms = new ArrayList<Term>(integral.getTerms());
+		Fraction integralCoefficient = terms.get(0).coefficient;
+		Fraction integralExponent = terms.get(0).exponent;
 		
 		assertTrue(integralCoefficient.numerator == 0);
 		assertTrue(integralCoefficient.denominator == 3);
@@ -57,8 +64,10 @@ public class IntegrationTest {
 		function.addTerm(t1);
 		
 		MathFunction integral = function.integrate();
-		Fraction integralCoefficient = integral.terms.get(0).coefficient;
-		Fraction integralExponent = integral.terms.get(0).exponent;
+
+        List<Term> terms = new ArrayList<Term>(integral.getTerms());
+		Fraction integralCoefficient = terms.get(0).coefficient;
+		Fraction integralExponent = terms.get(0).exponent;
 		
 		assertTrue(integralCoefficient.numerator == 2);
 		assertTrue(integralCoefficient.denominator == 1);
@@ -77,8 +86,10 @@ public class IntegrationTest {
 		function.addTerm(t1);
 		
 		MathFunction integral = function.integrate();
-		Fraction integralCoefficient = integral.terms.get(0).coefficient;
-		Fraction integralExponent = integral.terms.get(0).exponent;
+
+        List<Term> terms = new ArrayList<Term>(integral.getTerms());
+		Fraction integralCoefficient = terms.get(0).coefficient;
+		Fraction integralExponent = terms.get(0).exponent;
 		
 		assertTrue(integralCoefficient.numerator == 1);
 		assertTrue(integralCoefficient.denominator == 8);
@@ -97,8 +108,10 @@ public class IntegrationTest {
 		function.addTerm(t1);
 		
 		MathFunction integral = function.integrate();
-		Fraction integralCoefficient = integral.terms.get(0).coefficient;
-		Fraction integralExponent = integral.terms.get(0).exponent;
+
+        List<Term> terms = new ArrayList<Term>(integral.getTerms());
+		Fraction integralCoefficient = terms.get(0).coefficient;
+		Fraction integralExponent = terms.get(0).exponent;
 		
 		assertTrue(integralCoefficient.numerator == 3);
 		assertTrue(integralCoefficient.denominator == 2);
