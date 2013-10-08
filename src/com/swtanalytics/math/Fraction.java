@@ -47,34 +47,27 @@ public class Fraction {
         return result;
     }
 
-    public String formatString(boolean stripPositive, boolean spaceAfterCoefficientSign) {
+    public String formatString(boolean stripPositive) {
         int n = this.numerator;
         int d = Math.abs(this.denominator);
         if (this.denominator < 0) {
             n *= -1;
         }
 
-        boolean isPositive = this.numerator * this.denominator > 0;
-        String sign = isPositive
-                ? "+"
-                : "-";
-
-        String numeratorPart;
-        if (isPositive && stripPositive) {
-            numeratorPart = String.format("%d", Math.abs(n));
-        } else if (spaceAfterCoefficientSign) {
-            numeratorPart = String.format("%s %d", sign, Math.abs(n));
+        String fmt;
+        if (stripPositive) {
+            fmt = "%d";
         } else {
-            numeratorPart = String.format("%s%d", sign, Math.abs(n));
+            fmt = "%+d";
         }
         String result = String.format(fmt, n);
 
         // Collapse into integer
         if (d != 1) {
-            return String.format("%s/%d", numeratorPart, d);
+            result = String.format("%s/%d", result, d);
         }
 
-        return numeratorPart;
+        return result;
     }
 
     public double doubleValue() {
@@ -82,33 +75,36 @@ public class Fraction {
     }
 
     public int compareTo(Fraction f) {
-        Double result = (double) (f.doubleValue() - this.doubleValue());
+        Double result = new Double(f.doubleValue() - this.doubleValue());
         return result.intValue();
     }
 
     public Fraction subtract(Fraction f) {
-        int n = this.numerator * f.denominator - f.numerator * this.denominator;
-        int d = this.denominator * f.denominator;
+        int n = this.numerator*f.denominator - f.numerator*this.denominator;
+	int d = this.denominator*f.denominator;
         return new Fraction(n, d);
     }
 
     public Fraction multiply(Fraction f) {
-        return new Fraction(this.numerator * f.numerator,
-                this.denominator * f.denominator);
+        return new Fraction(this.numerator*f.numerator,
+                            this.denominator*f.denominator);
     }
 
-    private int gcf(int a, int b) {
-        int rem;
+    private int gcf(int a,int b)
+    {
+    	// TODO: In theory, gcf behavior should be undefined when one of the operands is 0.
+    	// Should this throw an error?
+        int rem = 0;
         int gcf = 0;
         do {
-            rem = a % b;
-            if (rem == 0)
-                gcf = b;
-            else {
-                a = b;
-                b = rem;
-            }
-        } while (rem != 0);
+	    rem = a % b;
+	    if (rem == 0)
+		gcf = b;
+	    else {
+		a = b;
+		b = rem;
+	    }
+	} while (rem != 0);
 
         return gcf;
     }
