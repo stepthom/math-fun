@@ -10,7 +10,7 @@ public class EasyMain {
     private final MathFunctionFactory functionFactory;
 
     public EasyMain() {
-        RandomGenerator randomGenerator = new RandomIntegerGeneratorUsingMathRandom();
+        RandomGenerator randomGenerator = new RandomGeneratorUsingMathRandom();
         FractionFactory fractionFactory = new RandomFractionFactory(randomGenerator);
         TermFactory termFactory = new RandomTermFactory(fractionFactory);
         functionFactory = new MathFunctionFactory(termFactory, randomGenerator);
