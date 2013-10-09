@@ -7,6 +7,8 @@ import org.kohsuke.args4j.CmdLineException;
 
 public class EasyMain {
     public static final int NUM_MATH_FUNCTIONS_DEFAULT = 10;
+    private static final double minDomain = -50;
+    private static final double maxDomain = 50;
     private final MathFunctionFactory functionFactory;
 
     public EasyMain() {
@@ -107,9 +109,29 @@ public class EasyMain {
         	printSlope(mf.computeSlope());
         }
         
+
+        printMin(mf);
+        printMax(mf);
+
     	if (outputXml) {
     		System.out.println("  </function>");
     	}
+    }
+
+    private void printMin(MathFunction function) {
+        if(outputXml) {
+            System.out.println("    <min>");
+            System.out.println("      " + function.findMinimum(minDomain, maxDomain));
+            System.out.println("    </min>");
+        }
+    }
+
+    private void printMax(MathFunction function) {
+        if(outputXml) {
+            System.out.println("    <max>");
+            System.out.println("      " + function.findMaximum(minDomain, maxDomain));
+            System.out.println("    </max>");
+        }
     }
 
     private void printSlope(Fraction slope) {

@@ -1,9 +1,11 @@
 *.class
+*.iml
 
 
 # Temporary dirs #
 .classpath
 .project
+.idea
 bin
 build
 dist

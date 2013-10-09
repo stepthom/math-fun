@@ -1,5 +1,10 @@
 package com.swtanalytics.math;
 
+import org.ejml.data.Complex64F;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.*;
 
 public class MathFunction {
@@ -76,8 +81,81 @@ public class MathFunction {
     	{
     		returnValue += term.evaluate(value);
     	}
-    	
-    	return returnValue;
+
+        return returnValue;
+    }
+
+    public double findMinimum(double minDomain, double maxDomain) {
+        List<Double> candidates = getValuesToConsider(minDomain, maxDomain);
+
+        double globalMin = Double.POSITIVE_INFINITY;
+
+        for (Double candidate : candidates) {
+            if (evaluate(candidate) < globalMin) {
+                globalMin = evaluate(candidate);
+            }
+        }
+
+        return globalMin;
+    }
+
+    private List<Double> getValuesToConsider(double minDomain, double maxDomain) {
+        MathFunction derivative = differentiate();
+        int maxExponent = 0;
+        for (Term term : derivative.terms) {
+            int exponentAsInt = (int) term.exponent.doubleValue();
+            if (exponentAsInt > maxExponent) {
+                maxExponent = exponentAsInt;
+            }
+        }
+
+        double[] inputCoefficients = new double[maxExponent + 1];
+        for (Term term : derivative.terms) {
+            if ((int)term.coefficient.doubleValue() != 0)
+                inputCoefficients[(int)term.exponent.doubleValue()] = term.coefficient.doubleValue();
+        }
+
+        List<Double> candidates;
+
+        if (inputCoefficients.length > 1) {
+            PolynomialRootFinder rootFinder = new PolynomialRootFinder();
+            Complex64F[] roots = rootFinder.findRoots(inputCoefficients);
+            candidates = getRealRootsInRange(roots, minDomain, maxDomain);
+        }
+        else {
+            candidates = new ArrayList<Double>();
+        }
+
+        candidates.add(minDomain);
+        candidates.add(maxDomain);
+
+        return candidates;
+    }
+
+    public double findMaximum(double minDomain, double maxDomain) {
+        List<Double> candidates = getValuesToConsider(minDomain, maxDomain);
+
+        double globalMax = Double.NEGATIVE_INFINITY;
+
+        for (Double candidate : candidates) {
+            if (evaluate(candidate) > globalMax) {
+                globalMax = evaluate(candidate);
+            }
+        }
+
+        return globalMax;
+    }
+
+    private List<Double> getRealRootsInRange(Complex64F[] roots, double minDomain, double maxDomain) {
+        List<Double> realRoots = new ArrayList<Double>();
+
+        for (Complex64F root : roots) {
+            if (root.isReal() && root.getReal() >= minDomain && root.getReal() <= maxDomain) {
+                realRoots.add(root.getReal());
+            }
+        }
+
+        return realRoots;
     }
 
     public boolean isLinearFunction() {
