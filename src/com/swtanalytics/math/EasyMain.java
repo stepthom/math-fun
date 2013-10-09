@@ -105,6 +105,11 @@ public class EasyMain {
         	printFunction(mf.integrate(), i, FunctionType.INTEGRAL);
         }
 
+        if (mf.isLinearFunction()) {
+        	printSlope(mf.computeSlope());
+        }
+        
+
         printMin(mf);
         printMax(mf);
 
@@ -126,6 +131,15 @@ public class EasyMain {
             System.out.println("    <max>");
             System.out.println("      " + function.findMaximum(minDomain, maxDomain));
             System.out.println("    </max>");
+        }
+    }
+
+    private void printSlope(Fraction slope) {
+        if (outputXml) {
+            System.out.println("    <slope>");
+            System.out.print("      ");
+            System.out.println(slope.formatString(true, false));
+            System.out.println("    </slope>");
         }
     }
 
