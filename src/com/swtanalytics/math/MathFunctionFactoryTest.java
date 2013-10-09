@@ -27,9 +27,10 @@ public class MathFunctionFactoryTest {
         // Arrange
         randomGenerator.generateIntResults.add(2);
 
-        Fraction fraction = new Fraction(1, 1);
-        Term term1 = new Term(fraction, fraction);
-        Term term2 = new Term(fraction, fraction);
+        Fraction fraction1 = new Fraction(1, 1);
+        Fraction fraction2 = new Fraction(2, 1);
+        Term term1 = new Term(fraction1, fraction1);
+        Term term2 = new Term(fraction2, fraction2);
         termFactory.results.add(term1);
         termFactory.results.add(term2);
 
@@ -37,9 +38,9 @@ public class MathFunctionFactoryTest {
         MathFunction result = factory.create(false, false);
 
         // Assert
-        List<Term> terms = new ArrayList<Term>(result.terms);
+        List<Term> terms = new ArrayList<Term>(result.getTerms());
         Assert.assertEquals(2, terms.size());
-        Assert.assertSame(term1, terms.get(0));
-        Assert.assertSame(term2, terms.get(1));
+        Assert.assertSame(term2, terms.get(0));
+        Assert.assertSame(term1, terms.get(1));
     }
 }

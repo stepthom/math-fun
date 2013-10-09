@@ -32,7 +32,7 @@ public class SortTest {
         // that each exponent is equal to or smaller than the last.
         Fraction lastExp = null;
         boolean firstTerm = true;
-        for (Term t : mf.terms) {
+        for (Term t : mf.getTerms()) {
             if (firstTerm) {
                 firstTerm = false;
             } else {

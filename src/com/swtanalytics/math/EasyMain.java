@@ -102,10 +102,23 @@ public class EasyMain {
         if (this.isPrintIntegral) {
         	printFunction(mf.integrate(), i, FunctionType.INTEGRAL);
         }
+
+        if (mf.isLinearFunction()) {
+        	printSlope(mf.computeSlope());
+        }
         
     	if (outputXml) {
     		System.out.println("  </function>");
     	}
+    }
+
+    private void printSlope(Fraction slope) {
+        if (outputXml) {
+            System.out.println("    <slope>");
+            System.out.print("      ");
+            System.out.println(slope.formatString(true, false));
+            System.out.println("    </slope>");
+        }
     }
 
     protected void printFunction(MathFunction mf, int i, FunctionType type) {

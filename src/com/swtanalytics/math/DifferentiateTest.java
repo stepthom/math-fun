@@ -43,7 +43,7 @@ public class DifferentiateTest {
 	    mf.addTerm(TERMS[i]);
 
 	    MathFunction difs = mf.differentiate();
-	    ArrayList<Term> d = difs.terms;
+	    ArrayList<Term> d = new ArrayList<Term>(difs.getTerms());
 
  	    Assert.assertTrue(BAD_DIFFERENTIATE_MSG, d.get(0).coefficient.compareTo(DERIVATIVES[i].coefficient)==0);
  	    Assert.assertTrue(BAD_DIFFERENTIATE_MSG, d.get(0).exponent.compareTo(DERIVATIVES[i].exponent)==0);
