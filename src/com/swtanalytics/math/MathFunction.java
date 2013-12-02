@@ -80,6 +80,11 @@ public class MathFunction {
     	return returnValue;
     }
 
+    public Fraction degree()
+    {
+        return termsByExponent.isEmpty() ? new Fraction(0, 0) : termsByExponent.firstKey();
+    }
+
     public boolean isLinearFunction() {
         for (Fraction term : termsByExponent.keySet()){
             if (!term.equals(zero) && !term.equals(one)) {
