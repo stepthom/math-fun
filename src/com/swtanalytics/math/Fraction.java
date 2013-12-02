@@ -76,7 +76,7 @@ public class Fraction implements Comparable<Fraction> {
     }
 
     public int compareTo(Fraction f) {
-        return new Double(f.doubleValue()).compareTo(this.doubleValue());
+        return new Double(this.doubleValue()).compareTo(f.doubleValue());
     }
 
     public Fraction add(Fraction toAdd) {
