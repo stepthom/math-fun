@@ -10,7 +10,7 @@ public class MathFunctionFactory {
     }
 
     public MathFunction create(boolean forceWholeNumberCoefficients, boolean forceLinearFunction) {
-        return create(forceWholeNumberCoefficients, randomGenerator.generateInt(1, 5), forceLinearFunction ? 1 : 100, forceLinearFunction);
+        return create(forceWholeNumberCoefficients, randomGenerator.generateInt(1, 5), forceLinearFunction ? 1 : 10, forceLinearFunction);
     }
 
     public MathFunction create(boolean forceWholeNumberCoefficients, int termCount, int maxDegree, boolean strictDegree) {

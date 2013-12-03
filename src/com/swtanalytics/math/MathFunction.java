@@ -7,6 +7,9 @@ public class MathFunction {
     private static final Fraction zero = new Fraction(0, 1);
     private static final Fraction one = new Fraction(1, 1);
 
+    private static final double NEWTON_Y_EPSILON = 1.0E-12;
+    private static final double NEWTON_X_EPSILON = 1.0E-12;
+
     private TreeMap<Fraction, Term> termsByExponent = new TreeMap<Fraction, Term>(new ReverseFractionComparator());
 
     public MathFunction() {
@@ -21,6 +24,11 @@ public class MathFunction {
 
     public Collection<Term> getTerms() {
         return termsByExponent.values();
+    }
+
+    private Fraction getCoefficient(Fraction exponent) {
+        Term term = termsByExponent.get(exponent);
+        return term == null ? zero : term.coefficient;
     }
 
     public String toString() {
@@ -135,7 +143,11 @@ public class MathFunction {
     }
 
     public boolean isConstant() {
-        return (termsByExponent.size() <= 1) && degree() == zero;
+        return (termsByExponent.size() <= 1) && degree().equals(zero);
+    }
+
+    public boolean hasNegativeExponent() {
+        return (0 < termsByExponent.size()) && (termsByExponent.lastKey().compareTo(zero) < 0);
     }
 
     public boolean hasFractionalExponent() {
@@ -157,5 +169,121 @@ public class MathFunction {
         }
 
         return zero;
+    }
+
+    public List<Double> solve() {
+        // We *could* special-case f(x) = 0, which has infinite solutions, but I'm not sure what we would return in that
+        // case, so let's treat it as any other constant function in the check below
+
+        if (isConstant()) {
+            // No solutions
+            return Collections.<Double>emptyList();
+        }
+
+        if (isLinearFunction()) {
+            // Closed-form solution to 0 = ax+b : x = -b/a
+            double a = getCoefficient(one).doubleValue();
+            double b = getCoefficient(zero).doubleValue();
+            return Collections.singletonList(-b / a);
+        }
+
+        // TODO - we could check for and implement the closed-form solution for a simple quadratic equation here
+
+        // General case: divide the domain into spans between inflection points. Any such span should have at most one
+        // interior solution; use Newton's method to find it if it exists.
+
+        MathFunction derivative = differentiate();
+        List<Double> solutions = new ArrayList<Double>();
+
+        double domainBegin;
+        double rangeBegin;
+        double domainEnd = Double.NEGATIVE_INFINITY;
+        double rangeEnd = evaluate(domainEnd);
+
+        for (double newDomainEnd : getInflections(derivative)) {
+            domainBegin = domainEnd;
+            rangeBegin = rangeEnd;
+            domainEnd = newDomainEnd;
+            rangeEnd = evaluate(domainEnd);
+
+            if (rangeBegin == 0) {
+                solutions.add(domainBegin);
+            }
+            double solution = interiorSolution(domainBegin, domainEnd, derivative);
+            if (!Double.isNaN(solution)) {
+                solutions.add(solution);
+            }
+        }
+
+        domainBegin = domainEnd;
+        rangeBegin = rangeEnd;
+        domainEnd = Double.POSITIVE_INFINITY;
+        rangeEnd = evaluate(domainEnd);
+
+        if (rangeBegin == 0) {
+            solutions.add(domainBegin);
+        }
+        double solution = interiorSolution(domainBegin, domainEnd, derivative);
+        if (!Double.isNaN(solution)) {
+            solutions.add(solution);
+        }
+        if (rangeEnd == 0) {
+            solutions.add(domainEnd);
+        }
+
+        return solutions;
+    }
+
+    private double interiorSolution(double domainBegin, double domainEnd, MathFunction derivative) {
+        double rangeBegin = evaluate(domainBegin);
+        double rangeEnd = evaluate(domainEnd);
+        if (0 <= rangeBegin && 0 <= rangeEnd) {
+            return Double.NaN;
+        }
+        if (rangeBegin <= 0 && rangeEnd <= 0) {
+            return Double.NaN;
+        }
+
+        double x;
+        if (Double.isInfinite(domainBegin)) {
+            if (Double.isInfinite(domainEnd)) {
+                x = 0;
+            } else {
+                x = domainEnd - 1;
+            }
+        } else {
+            if (Double.isInfinite(domainEnd)) {
+                x = domainBegin + 1;
+            } else {
+                x = (domainBegin + domainEnd) / 2;
+            }
+        }
+
+        while (true)
+        {
+            double y = evaluate(x);
+            if (Math.abs(y) < NEWTON_Y_EPSILON) { return x; }
+
+            double newX = x - y / derivative.evaluate(x);
+            if (Math.abs(x - newX) < NEWTON_X_EPSILON) { return x; }
+
+            x = newX;
+
+            // TODO: Check for cycles or diversion, and fall back to something else (binary search, or something
+            // fancier.) This shouldn't be an issue with simple polynomials.
+        }
+    }
+
+    private List<Double> getInflections(MathFunction derivative) {
+        if (isLinearFunction()) {
+            return Collections.<Double>emptyList();
+        }
+        if (hasNegativeExponent()) {
+            throw new UnsupportedOperationException(); // an exercise for the reader ;-)
+        }
+        if (hasFractionalExponent()) {
+            throw new UnsupportedOperationException(); // an exercise for the reader ;-)
+        }
+        return derivative.solve();
     }
 }
