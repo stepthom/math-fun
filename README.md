@@ -13,7 +13,7 @@ f(x) = Ax^a + Bx^b + ...
 That is, a function will be a set of terms, where each term has a coefficient
 and an exponent.
 
-This package will also provide utitlies for analyzing the functions in various
+This package will also provide utilities for analyzing the functions in various
 ways, e.g., differentiation, integration, finding local and global extrema, etc.
 
 Compile
@@ -37,8 +37,11 @@ java -jar dist/math-fun.jar [options]
 
 where the options are:
 - `-n NUM`: The number of functions to randomly generate and display. (Default: 10)
-- `-d`: Print the deriviate of each function, too. (Default: off)
+- `-d`: Print the derivative of each function, too. (Default: off)
+- `-i`: Print the integral of each function as well. (Default: off)
 - `-f`: Generate fractional coefficients and exponents. (Default: off)
+- `-x`: Format output as XML. (Default: off)
+- `-l`: Create only linear functions. (Default: off)
 
 
 
