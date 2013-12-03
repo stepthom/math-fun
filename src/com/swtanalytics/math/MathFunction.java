@@ -6,7 +6,7 @@ public class MathFunction {
     private static final Fraction zero = new Fraction(0, 1);
     private static final Fraction one = new Fraction(1, 1);
 
-    private TreeMap<Fraction, Term> termsByExponent = new TreeMap<Fraction, Term>();
+    private TreeMap<Fraction, Term> termsByExponent = new TreeMap<Fraction, Term>(new ReverseFractionComparator());
 
     public MathFunction() {}
 
