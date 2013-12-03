@@ -28,6 +28,12 @@ public class Fraction implements Comparable<Fraction> {
         }
     }
 
+    public Fraction(int whole)
+    {
+        this.numerator = whole;
+        this.denominator = 1;
+    }
+
     public String toString() {
         int n = this.numerator;
         int d = Math.abs(this.denominator);

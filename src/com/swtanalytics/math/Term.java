@@ -2,13 +2,29 @@ package com.swtanalytics.math;
 
 public class Term implements Comparable<Term> {
 
-	protected Fraction coefficient;
-	protected Fraction exponent;
-		
-	public Term (Fraction c, Fraction e) {
-		this.coefficient = c;
-		this.exponent = e;
-	}
+    protected Fraction coefficient;
+    protected Fraction exponent;
+
+    public Term(Fraction c, Fraction e) {
+        this.coefficient = c;
+        this.exponent = e;
+    }
+
+    public Term(Fraction c, int e) {
+        this.coefficient = c;
+        this.exponent = new Fraction(e);
+    }
+
+    public Term(int c, Fraction e) {
+        this.coefficient = new Fraction(c);
+        this.exponent = e;
+    }
+
+    public Term(int c, int e) {
+        this.coefficient = new Fraction(c);
+        this.exponent = new Fraction(e);
+    }
+
     public String prettyPrint(boolean isFirstTerm) {
         return this.formatString(isFirstTerm);
     }
@@ -28,11 +44,9 @@ public class Term implements Comparable<Term> {
         String variablePart;
         if (this.exponent.numerator == 0) {
             variablePart = "";
-        }
-        else if (this.exponent.numerator == this.exponent.denominator) {
+        } else if (this.exponent.numerator == this.exponent.denominator) {
             variablePart = "x";
-        }
-        else {
+        } else {
             variablePart = "x^" + this.exponent.formatString(true, false);
         }
 
@@ -55,11 +69,11 @@ public class Term implements Comparable<Term> {
     }
 
     public double evaluate(double value) {
-    	double returnValue = 0d;
-    	
-    	returnValue = Math.pow(value, exponent.doubleValue()) * coefficient.doubleValue();
+        double returnValue = 0d;
 
-    	return returnValue;
+        returnValue = Math.pow(value, exponent.doubleValue()) * coefficient.doubleValue();
+
+        return returnValue;
     }
 
     public Term add(Term toAdd) {

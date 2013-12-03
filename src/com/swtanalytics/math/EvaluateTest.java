@@ -26,15 +26,15 @@ public class EvaluateTest {
     @Parameterized.Parameters
     public static Collection testCases() {
         return Arrays.asList(new Object[][]{
-                {new Term[]{new Term(new Fraction(4, 1), new Fraction(3, 1))}, 10, 4000},
-                {new Term[]{new Term(new Fraction(1, 2), new Fraction(3, 1))}, 10, 500},
-                {new Term[]{new Term(new Fraction(2, 1), new Fraction(1, 2))}, 4, 4},
-                {new Term[]{new Term(new Fraction(0, 1), new Fraction(2, 1))}, 4, 0},
-                {new Term[]{new Term(new Fraction(2, 1), new Fraction(0, 1))}, 2, 2},
-                {new Term[]{new Term(new Fraction(-2, 1), new Fraction(2, 1))}, 2, -8},
-                {new Term[]{new Term(new Fraction(2, 1), new Fraction(-2, 1))}, 2, 0.5},
-                {new Term[]{new Term(new Fraction(2, 1), new Fraction(2, 1)), new Term(new Fraction(4, 1), new Fraction(1, 1))}, 3, 30},
-                {new Term[]{new Term(new Fraction(2, 1), new Fraction(2, 1)), new Term(new Fraction(-4, 1), new Fraction(1, 1))}, 3, 6},
+                {new Term[]{new Term(4, 3)}, 10, 4000},
+                {new Term[]{new Term(new Fraction(1, 2), 3)}, 10, 500},
+                {new Term[]{new Term(2, new Fraction(1, 2))}, 4, 4},
+                {new Term[]{new Term(0, 2)}, 4, 0},
+                {new Term[]{new Term(2, 0)}, 2, 2},
+                {new Term[]{new Term(-2, 2)}, 2, -8},
+                {new Term[]{new Term(2, -2)}, 2, 0.5},
+                {new Term[]{new Term(2, 2), new Term(4, 1)}, 3, 30},
+                {new Term[]{new Term(2, 2), new Term(-4, 1)}, 3, 6},
         });
     }
 
