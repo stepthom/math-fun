@@ -77,6 +77,14 @@ public class Fraction implements Comparable<Fraction> {
         return numeratorPart;
     }
 
+    public boolean isWhole() {
+        return Math.abs(denominator) == 1;
+    }
+
+    public int wholePart() {
+        return numerator / denominator;
+    }
+
     public double doubleValue() {
         return new Double(this.numerator) / this.denominator;
     }
