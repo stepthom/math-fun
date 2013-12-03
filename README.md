@@ -41,7 +41,7 @@ where the options are:
 - `-i`: Print the integral of each function as well. (Default: off)
 - `-f`: Generate fractional coefficients and exponents. (Default: off)
 - `-x`: Format output as XML. (Default: off)
-- `-l`: Create only linear functions. (Default: off)
+- `-l`: Create only strictly first-degree linear functions. (Default: off)
 
 
 

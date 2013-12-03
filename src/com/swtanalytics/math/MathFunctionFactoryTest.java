@@ -11,19 +11,17 @@ import java.util.List;
 
 @RunWith(JUnit4.class)
 public class MathFunctionFactoryTest {
-    private MathFunctionFactory factory;
-    private TermFactoryFake termFactory;
-    private RandomGeneratorFake randomGenerator;
 
     @Before
     public void before() {
-        termFactory = new TermFactoryFake();
-        randomGenerator = new RandomGeneratorFake();
-        factory = new MathFunctionFactory(termFactory, randomGenerator);
     }
 
     @Test
     public void functionCreatedHasRandomNumberOfTerms() {
+        RandomGeneratorFake randomGenerator = new RandomGeneratorFake();
+        TermFactoryFake termFactory = new TermFactoryFake();
+        MathFunctionFactory factory = new MathFunctionFactory(termFactory, randomGenerator);
+
         // Arrange
         randomGenerator.generateIntResults.add(2);
 
@@ -42,5 +40,20 @@ public class MathFunctionFactoryTest {
         Assert.assertEquals(2, terms.size());
         Assert.assertSame(term2, terms.get(0));
         Assert.assertSame(term1, terms.get(1));
+    }
+
+    @Test
+    public void forceLinearFunctionCreatesStrictlyLinearFunction() {
+        RandomGenerator randomGenerator = new SeededRandomGenerator(31337);
+        FractionFactory fractionFactory = new RandomFractionFactory(randomGenerator);
+        TermFactory termFactory = new RandomTermFactory(fractionFactory);
+        MathFunctionFactory factory = new MathFunctionFactory(termFactory, randomGenerator);
+
+        for (int i = 0; i < 1000; ++i)
+        {
+            MathFunction function = factory.create(false, true);
+            Assert.assertTrue(function.isLinearFunction());
+            Assert.assertEquals(new Fraction(1, 1), function.degree());
+        }
     }
 }

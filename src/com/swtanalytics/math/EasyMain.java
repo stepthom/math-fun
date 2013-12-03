@@ -38,7 +38,7 @@ public class EasyMain {
     @Option(name="-i", usage="Print integrals too.")
     public boolean isPrintIntegral = false;
 
-    @Option(name="-l", usage="Create only linear functions.")
+    @Option(name="-l", usage="Create only strictly first-degree linear functions.")
     public boolean forceLinearFunctions = false;
 
     protected void parse_input(String[] args) {
