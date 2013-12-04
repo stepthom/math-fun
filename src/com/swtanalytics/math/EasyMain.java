@@ -116,6 +116,8 @@ public class EasyMain {
         
         printMinMax(mf);
         
+        printIntercepts(mf);
+
     	if (outputXml) {
     		System.out.println("  </function>");
     	}
@@ -145,6 +147,18 @@ public class EasyMain {
             double maxY = function.evaluate(maxX);
             if (!Double.isNaN(maxX) && !Double.isNaN(maxY)) {
                 System.out.format(outputXml ? "    <max>(%f, %f)</max>%n" : "Max:(%f, %f)%n", maxX, maxY);
+            }
+        } catch (UnsupportedOperationException e) {
+        }
+    }
+
+    private void printIntercepts(MathFunction function) {
+        System.out.format(outputXml ? "    <y-intercept>%f</y-intercept>%n" : "Y-intercept:%f%n", function.evaluate(0));
+
+        try {
+            for (double solution : function.solve())
+            {
+                System.out.format(outputXml ? "    <x-intercept>%f</x-intercept>%n" : "X-intercept:%f%n", solution);
             }
         } catch (UnsupportedOperationException e) {
         }
