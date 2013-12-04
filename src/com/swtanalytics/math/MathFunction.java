@@ -261,41 +261,38 @@ public class MathFunction {
     }
 
     private double interiorSolution(double domainBegin, double domainEnd) {
-        double rangeBegin = evaluate(domainBegin);
-        double rangeEnd = evaluate(domainEnd);
-        if (0 <= rangeBegin && 0 <= rangeEnd) {
-            return Double.NaN;
-        }
-        if (rangeBegin <= 0 && rangeEnd <= 0) {
+        int rangeBeginSign = Double.compare(evaluate(domainBegin), 0);
+        int rangeEndSign = Double.compare(evaluate(domainEnd), 0);
+        if (rangeBeginSign == 0 || rangeEndSign == 0 || rangeBeginSign == rangeEndSign) {
             return Double.NaN;
         }
 
-        double x;
-        if (Double.isInfinite(domainBegin)) {
-            if (Double.isInfinite(domainEnd)) {
-                x = 0;
-            } else {
-                x = domainEnd - 1;
-            }
-        } else {
-            if (Double.isInfinite(domainEnd)) {
-                x = domainBegin + 1;
-            } else {
-                x = (domainBegin + domainEnd) / 2;
-            }
-        }
-
-        if (Math.abs(domainEnd - domainBegin) < NEWTON_X_EPSILON)
-        {
-            return x;
-        }
+        double x = getDivisionPoint(domainBegin, domainEnd);
 
         MathFunction derivative = differentiate();
 
         while (true) {
+            if (Math.abs(domainEnd - domainBegin) < NEWTON_X_EPSILON) {
+                return x;
+            }
+
             double y = evaluate(x);
             if (y == 0) {
                 return x;
+            }
+            int ySign = Double.compare(y, 0);
+            assert ySign != 0;
+            assert rangeBeginSign != 0;
+            assert rangeEndSign != 0;
+            assert rangeBeginSign != rangeEndSign;
+            assert (ySign == rangeBeginSign) ^ (ySign == rangeEndSign);
+
+            if (ySign == rangeBeginSign) {
+                domainBegin = x;
+                rangeBeginSign = ySign;
+            } else {
+                domainEnd = x;
+                rangeEndSign = ySign;
             }
 
             double newX = x - y / derivative.evaluate(x);
@@ -303,30 +300,36 @@ public class MathFunction {
                 return x;
             }
 
-            if (Double.isNaN(newX) || newX <= domainBegin || domainEnd <= newX)
-            {
-                // Either we've had some rounding error, we're diverging, or our walk took us out of the search range.
+            if (Double.isNaN(newX) || newX <= domainBegin || domainEnd <= newX) {
+                // Either we've had some rounding error, we're diverging, we're looping, or our walk took us out of the search range.
                 // In any case, let's fall back to a search-by-division on this step.
-                int ySign = Double.compare(y, 0);
-                int rangeBeginSign = Double.compare(rangeBegin, 0);
-                int rangeEndSign = Double.compare(rangeEnd, 0);
-                assert ySign != 0;
-                assert rangeBeginSign != 0;
-                assert rangeEndSign != 0;
-                assert rangeBeginSign != rangeEndSign;
-                assert (ySign != rangeBeginSign) || (ySign != rangeEndSign);
-                if (ySign != rangeBeginSign)
-                {
-                    return interiorSolution(domainBegin, x);
-                }
-                else
-                {
-                    return interiorSolution(x, domainEnd);
+                if (ySign != rangeBeginSign) {
+                    newX = getDivisionPoint(domainBegin, x);
+                } else {
+                    newX = getDivisionPoint(x, domainEnd);
                 }
             }
 
             x = newX;
         }
+    }
+
+    private double getDivisionPoint(double begin, double end) {
+        double x;
+        if (Double.isInfinite(begin)) {
+            if (Double.isInfinite(end)) {
+                x = 0;
+            } else {
+                x = end - 1;
+            }
+        } else {
+            if (Double.isInfinite(end)) {
+                x = begin + 1;
+            } else {
+                x = (begin + end) / 2;
+            }
+        }
+        return x;
     }
 
     private List<Double> getCriticalPoints() {
