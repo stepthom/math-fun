@@ -11,6 +11,8 @@ public class MathFunction {
     private static final double NEWTON_X_EPSILON = 1.0E-12;
 
     private TreeMap<Fraction, Term> termsByExponent = new TreeMap<Fraction, Term>(new ReverseFractionComparator());
+    private MathFunction cachedDerivative;
+    private MathFunction cachedIntegral;
 
     public MathFunction() {
     }
@@ -20,6 +22,8 @@ public class MathFunction {
                 ? termsByExponent.get(t.exponent).add(t)
                 : t;
         termsByExponent.put(newTerm.exponent, newTerm);
+        cachedDerivative = null;
+        cachedIntegral = null;
     }
 
     public Collection<Term> getTerms() {
@@ -44,39 +48,43 @@ public class MathFunction {
     }
 
     public MathFunction differentiate() {
-        MathFunction df = new MathFunction();
-        for (Term t : termsByExponent.values()) {
-            // XXX This will make uncollapsed x^0 and x^1 terms in the
-            //     Style of the original class.
-            Fraction c;
-            Fraction e;
-            if (t.exponent.numerator == 0) {
-                // Leave the zero terms in case its the only one.
-                c = new Fraction(0, 1);
-                e = new Fraction(0, 1);
-            } else {
-                c = t.coefficient.multiply(t.exponent);
-                e = t.exponent.subtract(new Fraction(1, 1));
+        if (cachedDerivative == null) {
+            cachedDerivative = new MathFunction();
+            for (Term t : termsByExponent.values()) {
+                // XXX This will make uncollapsed x^0 and x^1 terms in the
+                //     Style of the original class.
+                Fraction c;
+                Fraction e;
+                if (t.exponent.numerator == 0) {
+                    // Leave the zero terms in case its the only one.
+                    c = new Fraction(0, 1);
+                    e = new Fraction(0, 1);
+                } else {
+                    c = t.coefficient.multiply(t.exponent);
+                    e = t.exponent.subtract(new Fraction(1, 1));
+                }
+                Term dt = new Term(c, e);
+                cachedDerivative.addTerm(dt);
             }
-            Term dt = new Term(c, e);
-            df.addTerm(dt);
         }
 
-        return df;
+        return cachedDerivative;
     }
 
     public MathFunction integrate() {
-        MathFunction integral = new MathFunction();
+        if (cachedIntegral == null) {
+            cachedIntegral = new MathFunction();
 
-        for (Term t : termsByExponent.values()) {
-            Fraction exp = new Fraction(t.exponent.numerator + t.exponent.denominator, t.exponent.denominator);
-            Fraction coef = t.coefficient.multiply(new Fraction(exp.denominator, exp.numerator));
+            for (Term t : termsByExponent.values()) {
+                Fraction exp = new Fraction(t.exponent.numerator + t.exponent.denominator, t.exponent.denominator);
+                Fraction coef = t.coefficient.multiply(new Fraction(exp.denominator, exp.numerator));
 
-            Term integralTerm = new Term(coef, exp);
-            integral.addTerm(integralTerm);
+                Term integralTerm = new Term(coef, exp);
+                cachedIntegral.addTerm(integralTerm);
+            }
         }
 
-        return integral;
+        return cachedIntegral;
     }
 
     public double evaluate(double value) {
@@ -189,10 +197,9 @@ public class MathFunction {
 
         // TODO - we could check for and implement the closed-form solution for a simple quadratic equation here
 
-        // General case: divide the domain into spans between inflection points. Any such span should have at most one
+        // General case: divide the domain into spans between critical points. Any such span should have at most one
         // interior solution; use Newton's method to find it if it exists.
 
-        MathFunction derivative = differentiate();
         List<Double> solutions = new ArrayList<Double>();
 
         double domainBegin;
@@ -200,7 +207,7 @@ public class MathFunction {
         double domainEnd = Double.NEGATIVE_INFINITY;
         double rangeEnd = evaluate(domainEnd);
 
-        for (double newDomainEnd : getInflections(derivative)) {
+        for (double newDomainEnd : getCriticalPoints()) {
             domainBegin = domainEnd;
             rangeBegin = rangeEnd;
             domainEnd = newDomainEnd;
@@ -209,7 +216,7 @@ public class MathFunction {
             if (rangeBegin == 0) {
                 solutions.add(domainBegin);
             }
-            double solution = interiorSolution(domainBegin, domainEnd, derivative);
+            double solution = interiorSolution(domainBegin, domainEnd);
             if (!Double.isNaN(solution)) {
                 solutions.add(solution);
             }
@@ -223,7 +230,7 @@ public class MathFunction {
         if (rangeBegin == 0) {
             solutions.add(domainBegin);
         }
-        double solution = interiorSolution(domainBegin, domainEnd, derivative);
+        double solution = interiorSolution(domainBegin, domainEnd);
         if (!Double.isNaN(solution)) {
             solutions.add(solution);
         }
@@ -234,7 +241,7 @@ public class MathFunction {
         return solutions;
     }
 
-    private double interiorSolution(double domainBegin, double domainEnd, MathFunction derivative) {
+    private double interiorSolution(double domainBegin, double domainEnd) {
         double rangeBegin = evaluate(domainBegin);
         double rangeEnd = evaluate(domainEnd);
         if (0 <= rangeBegin && 0 <= rangeEnd) {
@@ -259,6 +266,8 @@ public class MathFunction {
             }
         }
 
+        MathFunction derivative = differentiate();
+
         while (true) {
             double y = evaluate(x);
             if (Math.abs(y) < NEWTON_Y_EPSILON) {
@@ -277,7 +286,7 @@ public class MathFunction {
         }
     }
 
-    private List<Double> getInflections(MathFunction derivative) {
+    private List<Double> getCriticalPoints() {
         if (isLinearFunction()) {
             return Collections.emptyList();
         }
@@ -287,19 +296,19 @@ public class MathFunction {
         if (hasFractionalExponent()) {
             throw new UnsupportedOperationException(); // an exercise for the reader ;-)
         }
-        return derivative.solve();
+
+        return differentiate().solve();
     }
 
     public double findMaximum(double domainMin, double domainMax) {
         double xMax = domainMin;
         double yMax = evaluate(xMax);
-        MathFunction derivative = differentiate();
-        for (double inflection : getInflections(derivative)) {
-            if (inflection <= domainMin) continue;
-            if (domainMax <= inflection) break;
-            double y = evaluate(inflection);
+        for (double critical : getCriticalPoints()) {
+            if (critical <= domainMin) continue;
+            if (domainMax <= critical) break;
+            double y = evaluate(critical);
             if (yMax < y) {
-                xMax = inflection;
+                xMax = critical;
                 yMax = y;
             }
         }
@@ -313,13 +322,12 @@ public class MathFunction {
     public double findMinimum(double domainMin, double domainMax) {
         double xMin = domainMin;
         double yMin = evaluate(xMin);
-        MathFunction derivative = differentiate();
-        for (double inflection : getInflections(derivative)) {
-            if (inflection <= domainMin) continue;
-            if (domainMax <= inflection) break;
-            double y = evaluate(inflection);
+        for (double critical : getCriticalPoints()) {
+            if (critical <= domainMin) continue;
+            if (domainMax <= critical) break;
+            double y = evaluate(critical);
             if (y < yMin) {
-                xMin = inflection;
+                xMin = critical;
                 yMin = y;
             }
         }
