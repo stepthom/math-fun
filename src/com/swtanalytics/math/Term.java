@@ -83,4 +83,24 @@ public class Term implements Comparable<Term> {
 
         return new Term(coefficient.add(toAdd.coefficient), toAdd.exponent);
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Term)) return false;
+
+        Term term = (Term) o;
+
+        if (!coefficient.equals(term.coefficient)) return false;
+        if (!exponent.equals(term.exponent)) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = coefficient.hashCode();
+        result = 31 * result + exponent.hashCode();
+        return result;
+    }
 }

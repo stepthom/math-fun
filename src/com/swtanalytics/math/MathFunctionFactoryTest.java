@@ -52,6 +52,7 @@ public class MathFunctionFactoryTest {
         for (int i = 0; i < 1000; ++i)
         {
             MathFunction function = factory.create(false, true);
+            System.out.println(function.toString());
             Assert.assertTrue(function.isLinearFunction());
             Assert.assertEquals(new Fraction(1, 1), function.degree());
         }

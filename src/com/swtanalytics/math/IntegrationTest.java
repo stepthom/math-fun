@@ -32,28 +32,6 @@ public class IntegrationTest {
 	}
 
 	@Test
-	public void testZeroCoefficient() {
-		Fraction coefficient = new Fraction(0, 1);
-		Fraction exponent = new Fraction(2, 1);
-		
-		Term t1 = new Term(coefficient, exponent);
-		
-		MathFunction function = new MathFunction();
-		function.addTerm(t1);
-		
-		MathFunction integral = function.integrate();
-
-        List<Term> terms = new ArrayList<Term>(integral.getTerms());
-		Fraction integralCoefficient = terms.get(0).coefficient;
-		Fraction integralExponent = terms.get(0).exponent;
-		
-		assertTrue(integralCoefficient.numerator == 0);
-		assertTrue(integralCoefficient.denominator == 3);
-		assertTrue(integralExponent.numerator == 3);
-		assertTrue(integralExponent.denominator == 1);
-	}
-
-	@Test
 	public void testZeroExponent() {
 		Fraction coefficient = new Fraction(2, 1);
 		Fraction exponent = new Fraction(0, 1);

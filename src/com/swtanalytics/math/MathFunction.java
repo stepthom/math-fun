@@ -21,7 +21,11 @@ public class MathFunction {
         Term newTerm = termsByExponent.containsKey(t.exponent)
                 ? termsByExponent.get(t.exponent).add(t)
                 : t;
-        termsByExponent.put(newTerm.exponent, newTerm);
+        if (newTerm.coefficient.compareTo(zero) == 0) {
+            termsByExponent.remove(newTerm.exponent);
+        } else {
+            termsByExponent.put(newTerm.exponent, newTerm);
+        }
         cachedDerivative = null;
         cachedIntegral = null;
     }
@@ -38,10 +42,14 @@ public class MathFunction {
     public String toString() {
         String result = "f(x) = ";
 
-        boolean first_term = true;
-        for (Term t : termsByExponent.values()) {
-            result += (t.prettyPrint(first_term) + " ");
-            first_term = false;
+        if (termsByExponent.isEmpty()) {
+            result += "0";
+        } else {
+            boolean first_term = true;
+            for (Term t : termsByExponent.values()) {
+                result += (t.prettyPrint(first_term) + " ");
+                first_term = false;
+            }
         }
 
         return result;
@@ -53,18 +61,10 @@ public class MathFunction {
             for (Term t : termsByExponent.values()) {
                 // XXX This will make uncollapsed x^0 and x^1 terms in the
                 //     Style of the original class.
-                Fraction c;
-                Fraction e;
-                if (t.exponent.numerator == 0) {
-                    // Leave the zero terms in case its the only one.
-                    c = new Fraction(0, 1);
-                    e = new Fraction(0, 1);
-                } else {
-                    c = t.coefficient.multiply(t.exponent);
-                    e = t.exponent.subtract(new Fraction(1, 1));
+                if (t.exponent.numerator != 0) {
+                    Term dt = new Term(t.coefficient.multiply(t.exponent), t.exponent.subtract(new Fraction(1, 1)));
+                    cachedDerivative.addTerm(dt);
                 }
-                Term dt = new Term(c, e);
-                cachedDerivative.addTerm(dt);
             }
         }
 
@@ -88,7 +88,7 @@ public class MathFunction {
     }
 
     public double evaluate(double value) {
-        if (termsByExponent.size() == 0) {
+        if (termsByExponent.isEmpty()) {
             return 0;
         }
 
@@ -134,7 +134,7 @@ public class MathFunction {
     }
 
     public Fraction degree() {
-        return termsByExponent.isEmpty() ? new Fraction(0, 0) : termsByExponent.firstKey();
+        return termsByExponent.isEmpty() ? new Fraction(0) : termsByExponent.firstKey();
     }
 
     public boolean isLinearFunction() {
@@ -155,7 +155,7 @@ public class MathFunction {
     }
 
     public boolean hasNegativeExponent() {
-        return (0 < termsByExponent.size()) && (termsByExponent.lastKey().compareTo(zero) < 0);
+        return (!termsByExponent.isEmpty()) && (termsByExponent.lastKey().compareTo(zero) < 0);
     }
 
     public boolean hasFractionalExponent() {
