@@ -28,6 +28,12 @@ public class Fraction implements Comparable<Fraction> {
         }
     }
 
+    public Fraction(int whole)
+    {
+        this.numerator = whole;
+        this.denominator = 1;
+    }
+
     public String toString() {
         int n = this.numerator;
         int d = Math.abs(this.denominator);
@@ -69,6 +75,14 @@ public class Fraction implements Comparable<Fraction> {
         }
 
         return numeratorPart;
+    }
+
+    public boolean isWhole() {
+        return Math.abs(denominator) == 1;
+    }
+
+    public int wholePart() {
+        return numerator / denominator;
     }
 
     public double doubleValue() {

@@ -1,6 +1,7 @@
 package com.swtanalytics.math;
 
 import java.io.IOException;
+
 import org.kohsuke.args4j.Option;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.CmdLineException;
@@ -40,6 +41,12 @@ public class EasyMain {
 
     @Option(name="-l", usage="Create only strictly first-degree linear functions.")
     public boolean forceLinearFunctions = false;
+
+    @Option(name = "--domain-min", usage = "Domain minimum, for min/max calculations (defaults to -infinity)")
+    public double domainMin = Double.NEGATIVE_INFINITY;
+
+    @Option(name = "--domain-max", usage = "Domain maximum, for min/max calculations (defaults to +infinity)")
+    public double domainMax = Double.POSITIVE_INFINITY;
 
     protected void parse_input(String[] args) {
         CmdLineParser parser = new CmdLineParser(this);
@@ -107,6 +114,8 @@ public class EasyMain {
         	printSlope(mf.computeSlope());
         }
         
+        printMinMax(mf);
+        
     	if (outputXml) {
     		System.out.println("  </function>");
     	}
@@ -118,6 +127,26 @@ public class EasyMain {
             System.out.print("      ");
             System.out.println(slope.formatString(true, false));
             System.out.println("    </slope>");
+        }
+    }
+
+    private void printMinMax(MathFunction function) {
+        try {
+            double minX = function.findMinimum(domainMin, domainMax);
+            double minY = function.evaluate(minX);
+            if (!Double.isNaN(minX) && !Double.isNaN(minY)) {
+                System.out.format(outputXml ? "    <min>(%f, %f)</min>%n" : "Min:(%f, %f)%n", minX, minY);
+            }
+        } catch (UnsupportedOperationException e) {
+        }
+
+        try {
+            double maxX = function.findMaximum(domainMin, domainMax);
+            double maxY = function.evaluate(maxX);
+            if (!Double.isNaN(maxX) && !Double.isNaN(maxY)) {
+                System.out.format(outputXml ? "    <max>(%f, %f)</max>%n" : "Max:(%f, %f)%n", maxX, maxY);
+            }
+        } catch (UnsupportedOperationException e) {
         }
     }
 

@@ -1,144 +1,68 @@
 package com.swtanalytics.math;
 
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+
+import java.util.Arrays;
+import java.util.Collection;
+
 import static org.junit.Assert.*;
 
-import org.junit.Test;
-
+@RunWith(Parameterized.class)
 public class EvaluateTest {
 
-	@Test
-	public void testNormal() {
-		Fraction coefficient = new Fraction(4, 1);
-		Fraction exponent = new Fraction(3, 1);
-		
-		Term t1 = new Term(coefficient, exponent);
-		
-		MathFunction mf = new MathFunction();
-		mf.addTerm(t1);
-		
-		double result = mf.evaluate(10d);
-		assertTrue(result == 4000d);
-	}
-	
-	@Test
-	public void testFractionalCoefficient() {
-		Fraction coefficient = new Fraction(1, 2);
-		Fraction exponent = new Fraction(3, 1);
-		
-		Term t1 = new Term(coefficient, exponent);
-		
-		MathFunction mf = new MathFunction();
-		mf.addTerm(t1);
-		
-		double result = mf.evaluate(10d);
-		assertTrue(result == 500d);		
-	}
+    private static final double EPSILON = 1.0E-10;
+    private Term[] terms;
+    private double x;
+    private double expected;
 
-	@Test
-	public void testFractionalExponent() {
-		Fraction coefficient = new Fraction(2, 1);
-		Fraction exponent = new Fraction(1, 2);
-		
-		Term t1 = new Term(coefficient, exponent);
-		
-		MathFunction mf = new MathFunction();
-		mf.addTerm(t1);
-		
-		double result = mf.evaluate(4d);
-		assertTrue(result == 4d);		
-	}
-	
-	@Test
-	public void testZeroCoefficient() {
-		Fraction coefficient = new Fraction(0, 1);
-		Fraction exponent = new Fraction(2, 1);
-		
-		Term t1 = new Term(coefficient, exponent);
-		
-		MathFunction mf = new MathFunction();
-		mf.addTerm(t1);
-		
-		double result = mf.evaluate(4d);
-		assertTrue(result == 0d);		
-	}
+    public EvaluateTest(Term[] terms, double x, double expected) {
+        this.terms = terms;
+        this.x = x;
+        this.expected = expected;
+    }
 
-	@Test
-	public void testZeroExponent() {
-		Fraction coefficient = new Fraction(2, 1);
-		Fraction exponent = new Fraction(0, 1);
-		
-		Term t1 = new Term(coefficient, exponent);
-		
-		MathFunction mf = new MathFunction();
-		mf.addTerm(t1);
-		
-		double result = mf.evaluate(2d);
-		assertTrue(result == 2d);		
-	}
-	
-	@Test
-	public void testNegativeCoefficient() {
-		Fraction coefficient = new Fraction(-2, 1);
-		Fraction exponent = new Fraction(2, 1);
-		
-		Term t1 = new Term(coefficient, exponent);
-		
-		MathFunction mf = new MathFunction();
-		mf.addTerm(t1);
-		
-		double result = mf.evaluate(2d);
-		assertTrue(result == -8d);		
-	}
-	
-	@Test
-	public void testNegativeExponent() {
-		Fraction coefficient = new Fraction(2, 1);
-		Fraction exponent = new Fraction(-2, 1);
-		
-		Term t1 = new Term(coefficient, exponent);
-		
-		MathFunction mf = new MathFunction();
-		mf.addTerm(t1);
-		
-		double result = mf.evaluate(2d);
-		assertTrue(result == 0.5d);		
-	}
-	
-	@Test
-	public void testMultipleTerms() {
-		Fraction c1 = new Fraction(2, 1);
-		Fraction e1 = new Fraction(2, 1);
-				
-		Fraction c2 = new Fraction(4, 1);
-		Fraction e2 = new Fraction(1, 1);
-		
-		Term t1 = new Term(c1, e1);
-		Term t2 = new Term(c2, e2);
-		
-		MathFunction mf = new MathFunction();
-		mf.addTerm(t1);
-		mf.addTerm(t2);
-		
-		double result = mf.evaluate(3d);
-		assertTrue(result == 30d);		
-	}
+    @Parameterized.Parameters
+    public static Collection testCases() {
+        return Arrays.asList(new Object[][]{
+                {new Term[]{new Term(4, 3)}, 10, 4000},
+                {new Term[]{new Term(new Fraction(1, 2), 3)}, 10, 500},
+                {new Term[]{new Term(2, new Fraction(1, 2))}, 4, 4},
+                {new Term[]{new Term(2, new Fraction(1, 2))}, 0, 0},
+                {new Term[]{new Term(2, new Fraction(1, 2))}, -4, Double.NaN},
+                {new Term[]{new Term(0, 2)}, 4, 0},
+                {new Term[]{new Term(2, 0)}, 2, 2},
+                {new Term[]{new Term(-2, 2)}, 2, -8},
+                {new Term[]{new Term(2, -2)}, 2, 0.5},
+                {new Term[]{new Term(2, 2), new Term(4, 1)}, 3, 30},
+                {new Term[]{new Term(2, 2), new Term(-4, 1)}, 3, 6},
+                {new Term[]{new Term(1, 2)}, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY},
+                {new Term[]{new Term(1, 2)}, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY},
+                {new Term[]{new Term(1, 3)}, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY},
+                {new Term[]{new Term(1, 3)}, Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY},
+                {new Term[]{new Term(1, new Fraction(1, 2))}, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY},
+                {new Term[]{new Term(1, new Fraction(1, 2))}, Double.NEGATIVE_INFINITY, Double.NaN},
+                {new Term[]{new Term(42, 0)}, Double.POSITIVE_INFINITY, 42},
+                {new Term[]{new Term(42, 0)}, Double.NEGATIVE_INFINITY, 42},
+                {new Term[]{new Term(1, -1)}, Double.POSITIVE_INFINITY, 0},
+                {new Term[]{new Term(1, -1)}, Double.NEGATIVE_INFINITY, 0},
+                {new Term[]{new Term(1, -2)}, Double.POSITIVE_INFINITY, 0},
+                {new Term[]{new Term(1, -2)}, Double.NEGATIVE_INFINITY, 0},
+                {new Term[]{new Term(1, new Fraction(-1, 2))}, Double.POSITIVE_INFINITY, 0},
+                {new Term[]{new Term(1, new Fraction(-1, 2))}, Double.NEGATIVE_INFINITY, Double.NaN},
+        });
+    }
 
-	@Test
-	public void testMultipleTermsWithNegativeSecondTerm() {
-		Fraction c1 = new Fraction(2, 1);
-		Fraction e1 = new Fraction(2, 1);
-				
-		Fraction c2 = new Fraction(-4, 1);
-		Fraction e2 = new Fraction(1, 1);
-		
-		Term t1 = new Term(c1, e1);
-		Term t2 = new Term(c2, e2);
-		
-		MathFunction mf = new MathFunction();
-		mf.addTerm(t1);
-		mf.addTerm(t2);
-		
-		double result = mf.evaluate(3d);
-		assertTrue(result == 6d);		
-	}
+    @Test
+    public void test() {
+        MathFunction function = new MathFunction();
+        for (Term term : terms) {
+            function.addTerm(term);
+        }
+        System.out.println(function.toString());
+        double result = function.evaluate(x);
+        System.out.format("f(%f) = %f%n", x, result);
+        assertEquals(expected, result, EPSILON);
+    }
 }

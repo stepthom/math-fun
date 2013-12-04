@@ -42,6 +42,8 @@ where the options are:
 - `-f`: Generate fractional coefficients and exponents. (Default: off)
 - `-x`: Format output as XML. (Default: off)
 - `-l`: Create only strictly first-degree linear functions. (Default: off)
+- `--domain-min NUM`: Domain minimum, for min/max calculations. (Default: -Infinity)
+- `--domain-max NUM`: Domain maximum, for min/max calculations. (Default: +Infinity)
 
 
 
