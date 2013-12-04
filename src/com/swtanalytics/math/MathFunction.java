@@ -177,7 +177,7 @@ public class MathFunction {
 
         if (isConstant()) {
             // No solutions
-            return Collections.<Double>emptyList();
+            return Collections.emptyList();
         }
 
         if (isLinearFunction()) {
@@ -259,13 +259,16 @@ public class MathFunction {
             }
         }
 
-        while (true)
-        {
+        while (true) {
             double y = evaluate(x);
-            if (Math.abs(y) < NEWTON_Y_EPSILON) { return x; }
+            if (Math.abs(y) < NEWTON_Y_EPSILON) {
+                return x;
+            }
 
             double newX = x - y / derivative.evaluate(x);
-            if (Math.abs(x - newX) < NEWTON_X_EPSILON) { return x; }
+            if (Math.abs(x - newX) < NEWTON_X_EPSILON) {
+                return x;
+            }
 
             x = newX;
 
@@ -276,7 +279,7 @@ public class MathFunction {
 
     private List<Double> getInflections(MathFunction derivative) {
         if (isLinearFunction()) {
-            return Collections.<Double>emptyList();
+            return Collections.emptyList();
         }
         if (hasNegativeExponent()) {
             throw new UnsupportedOperationException(); // an exercise for the reader ;-)
@@ -285,5 +288,45 @@ public class MathFunction {
             throw new UnsupportedOperationException(); // an exercise for the reader ;-)
         }
         return derivative.solve();
+    }
+
+    public double findMaximum(double domainMin, double domainMax) {
+        double xMax = domainMin;
+        double yMax = evaluate(xMax);
+        MathFunction derivative = differentiate();
+        for (double inflection : getInflections(derivative)) {
+            if (inflection <= domainMin) continue;
+            if (domainMax <= inflection) break;
+            double y = evaluate(inflection);
+            if (yMax < y) {
+                xMax = inflection;
+                yMax = y;
+            }
+        }
+        double y = evaluate(domainMax);
+        if (yMax < y) {
+            xMax = domainMax;
+        }
+        return xMax;
+    }
+
+    public double findMinimum(double domainMin, double domainMax) {
+        double xMin = domainMin;
+        double yMin = evaluate(xMin);
+        MathFunction derivative = differentiate();
+        for (double inflection : getInflections(derivative)) {
+            if (inflection <= domainMin) continue;
+            if (domainMax <= inflection) break;
+            double y = evaluate(inflection);
+            if (y < yMin) {
+                xMin = inflection;
+                yMin = y;
+            }
+        }
+        double y = evaluate(domainMax);
+        if (y < yMin) {
+            xMin = domainMax;
+        }
+        return xMin;
     }
 }
