@@ -7,7 +7,6 @@ public class MathFunction {
     private static final Fraction zero = new Fraction(0, 1);
     private static final Fraction one = new Fraction(1, 1);
 
-    private static final double NEWTON_Y_EPSILON = 1.0E-12;
     private static final double NEWTON_X_EPSILON = 1.0E-12;
 
     private TreeMap<Fraction, Term> termsByExponent = new TreeMap<Fraction, Term>(new ReverseFractionComparator());
@@ -195,6 +194,26 @@ public class MathFunction {
             return Collections.singletonList(-b / a);
         }
 
+        if (0 < termsByExponent.lastKey().compareTo(zero)) {
+            // If all terms are of degree > 0, then 0 is a solution, and the other solutions can be found by dividing
+            // this function by its least significant term, and solving
+
+            Fraction leastDegree = termsByExponent.lastKey();
+            MathFunction simplified = new MathFunction();
+            for (Term term : termsByExponent.values()) {
+                simplified.addTerm(new Term(term.coefficient, term.exponent.subtract(leastDegree)));
+            }
+
+            List<Double> solutions = simplified.solve();
+            if (!solutions.contains(0.0)) {
+                solutions = new ArrayList<Double>(solutions); // solutions could be read-only
+                // TODO: Find & insert instead of sort
+                solutions.add(0.0);
+                Collections.sort(solutions);
+            }
+            return solutions;
+        }
+
         // TODO - we could check for and implement the closed-form solution for a simple quadratic equation here
 
         // General case: divide the domain into spans between critical points. Any such span should have at most one
@@ -266,11 +285,16 @@ public class MathFunction {
             }
         }
 
+        if (Math.abs(domainEnd - domainBegin) < NEWTON_X_EPSILON)
+        {
+            return x;
+        }
+
         MathFunction derivative = differentiate();
 
         while (true) {
             double y = evaluate(x);
-            if (Math.abs(y) < NEWTON_Y_EPSILON) {
+            if (y == 0) {
                 return x;
             }
 
@@ -279,10 +303,29 @@ public class MathFunction {
                 return x;
             }
 
-            x = newX;
+            if (Double.isNaN(newX) || newX <= domainBegin || domainEnd <= newX)
+            {
+                // Either we've had some rounding error, we're diverging, or our walk took us out of the search range.
+                // In any case, let's fall back to a search-by-division on this step.
+                int ySign = Double.compare(y, 0);
+                int rangeBeginSign = Double.compare(rangeBegin, 0);
+                int rangeEndSign = Double.compare(rangeEnd, 0);
+                assert ySign != 0;
+                assert rangeBeginSign != 0;
+                assert rangeEndSign != 0;
+                assert rangeBeginSign != rangeEndSign;
+                assert (ySign != rangeBeginSign) || (ySign != rangeEndSign);
+                if (ySign != rangeBeginSign)
+                {
+                    return interiorSolution(domainBegin, x);
+                }
+                else
+                {
+                    return interiorSolution(x, domainEnd);
+                }
+            }
 
-            // TODO: Check for cycles or diversion, and fall back to something else (binary search, or something
-            // fancier.) This shouldn't be an issue with simple polynomials.
+            x = newX;
         }
     }
 
