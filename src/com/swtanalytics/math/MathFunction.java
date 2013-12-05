@@ -7,7 +7,6 @@ public class MathFunction {
     private static final Fraction zero = new Fraction(0, 1);
     private static final Fraction one = new Fraction(1, 1);
 
-    private static final double NEWTON_Y_EPSILON = 1.0E-12;
     private static final double NEWTON_X_EPSILON = 1.0E-12;
 
     private TreeMap<Fraction, Term> termsByExponent = new TreeMap<Fraction, Term>(new ReverseFractionComparator());
@@ -21,7 +20,11 @@ public class MathFunction {
         Term newTerm = termsByExponent.containsKey(t.exponent)
                 ? termsByExponent.get(t.exponent).add(t)
                 : t;
-        termsByExponent.put(newTerm.exponent, newTerm);
+        if (newTerm.coefficient.compareTo(zero) == 0) {
+            termsByExponent.remove(newTerm.exponent);
+        } else {
+            termsByExponent.put(newTerm.exponent, newTerm);
+        }
         cachedDerivative = null;
         cachedIntegral = null;
     }
@@ -38,10 +41,14 @@ public class MathFunction {
     public String toString() {
         String result = "f(x) = ";
 
-        boolean first_term = true;
-        for (Term t : termsByExponent.values()) {
-            result += (t.prettyPrint(first_term) + " ");
-            first_term = false;
+        if (termsByExponent.isEmpty()) {
+            result += "0";
+        } else {
+            boolean first_term = true;
+            for (Term t : termsByExponent.values()) {
+                result += (t.prettyPrint(first_term) + " ");
+                first_term = false;
+            }
         }
 
         return result;
@@ -53,18 +60,10 @@ public class MathFunction {
             for (Term t : termsByExponent.values()) {
                 // XXX This will make uncollapsed x^0 and x^1 terms in the
                 //     Style of the original class.
-                Fraction c;
-                Fraction e;
-                if (t.exponent.numerator == 0) {
-                    // Leave the zero terms in case its the only one.
-                    c = new Fraction(0, 1);
-                    e = new Fraction(0, 1);
-                } else {
-                    c = t.coefficient.multiply(t.exponent);
-                    e = t.exponent.subtract(new Fraction(1, 1));
+                if (t.exponent.numerator != 0) {
+                    Term dt = new Term(t.coefficient.multiply(t.exponent), t.exponent.subtract(new Fraction(1, 1)));
+                    cachedDerivative.addTerm(dt);
                 }
-                Term dt = new Term(c, e);
-                cachedDerivative.addTerm(dt);
             }
         }
 
@@ -88,7 +87,7 @@ public class MathFunction {
     }
 
     public double evaluate(double value) {
-        if (termsByExponent.size() == 0) {
+        if (termsByExponent.isEmpty()) {
             return 0;
         }
 
@@ -134,7 +133,7 @@ public class MathFunction {
     }
 
     public Fraction degree() {
-        return termsByExponent.isEmpty() ? new Fraction(0, 0) : termsByExponent.firstKey();
+        return termsByExponent.isEmpty() ? new Fraction(0) : termsByExponent.firstKey();
     }
 
     public boolean isLinearFunction() {
@@ -155,7 +154,7 @@ public class MathFunction {
     }
 
     public boolean hasNegativeExponent() {
-        return (0 < termsByExponent.size()) && (termsByExponent.lastKey().compareTo(zero) < 0);
+        return (!termsByExponent.isEmpty()) && (termsByExponent.lastKey().compareTo(zero) < 0);
     }
 
     public boolean hasFractionalExponent() {
@@ -193,6 +192,26 @@ public class MathFunction {
             double a = getCoefficient(one).doubleValue();
             double b = getCoefficient(zero).doubleValue();
             return Collections.singletonList(-b / a);
+        }
+
+        if (0 < termsByExponent.lastKey().compareTo(zero)) {
+            // If all terms are of degree > 0, then 0 is a solution, and the other solutions can be found by dividing
+            // this function by its least significant term, and solving
+
+            Fraction leastDegree = termsByExponent.lastKey();
+            MathFunction simplified = new MathFunction();
+            for (Term term : termsByExponent.values()) {
+                simplified.addTerm(new Term(term.coefficient, term.exponent.subtract(leastDegree)));
+            }
+
+            List<Double> solutions = simplified.solve();
+            if (!solutions.contains(0.0)) {
+                solutions = new ArrayList<Double>(solutions); // solutions could be read-only
+                // TODO: Find & insert instead of sort
+                solutions.add(0.0);
+                Collections.sort(solutions);
+            }
+            return solutions;
         }
 
         // TODO - we could check for and implement the closed-form solution for a simple quadratic equation here
@@ -242,36 +261,38 @@ public class MathFunction {
     }
 
     private double interiorSolution(double domainBegin, double domainEnd) {
-        double rangeBegin = evaluate(domainBegin);
-        double rangeEnd = evaluate(domainEnd);
-        if (0 <= rangeBegin && 0 <= rangeEnd) {
-            return Double.NaN;
-        }
-        if (rangeBegin <= 0 && rangeEnd <= 0) {
+        int rangeBeginSign = Double.compare(evaluate(domainBegin), 0);
+        int rangeEndSign = Double.compare(evaluate(domainEnd), 0);
+        if (rangeBeginSign == 0 || rangeEndSign == 0 || rangeBeginSign == rangeEndSign) {
             return Double.NaN;
         }
 
-        double x;
-        if (Double.isInfinite(domainBegin)) {
-            if (Double.isInfinite(domainEnd)) {
-                x = 0;
-            } else {
-                x = domainEnd - 1;
-            }
-        } else {
-            if (Double.isInfinite(domainEnd)) {
-                x = domainBegin + 1;
-            } else {
-                x = (domainBegin + domainEnd) / 2;
-            }
-        }
+        double x = getDivisionPoint(domainBegin, domainEnd);
 
         MathFunction derivative = differentiate();
 
         while (true) {
-            double y = evaluate(x);
-            if (Math.abs(y) < NEWTON_Y_EPSILON) {
+            if (Math.abs(domainEnd - domainBegin) < NEWTON_X_EPSILON) {
                 return x;
+            }
+
+            double y = evaluate(x);
+            if (y == 0) {
+                return x;
+            }
+            int ySign = Double.compare(y, 0);
+            assert ySign != 0;
+            assert rangeBeginSign != 0;
+            assert rangeEndSign != 0;
+            assert rangeBeginSign != rangeEndSign;
+            assert (ySign == rangeBeginSign) ^ (ySign == rangeEndSign);
+
+            if (ySign == rangeBeginSign) {
+                domainBegin = x;
+                rangeBeginSign = ySign;
+            } else {
+                domainEnd = x;
+                rangeEndSign = ySign;
             }
 
             double newX = x - y / derivative.evaluate(x);
@@ -279,11 +300,36 @@ public class MathFunction {
                 return x;
             }
 
-            x = newX;
+            if (Double.isNaN(newX) || newX <= domainBegin || domainEnd <= newX) {
+                // Either we've had some rounding error, we're diverging, we're looping, or our walk took us out of the search range.
+                // In any case, let's fall back to a search-by-division on this step.
+                if (ySign != rangeBeginSign) {
+                    newX = getDivisionPoint(domainBegin, x);
+                } else {
+                    newX = getDivisionPoint(x, domainEnd);
+                }
+            }
 
-            // TODO: Check for cycles or diversion, and fall back to something else (binary search, or something
-            // fancier.) This shouldn't be an issue with simple polynomials.
+            x = newX;
         }
+    }
+
+    private double getDivisionPoint(double begin, double end) {
+        double x;
+        if (Double.isInfinite(begin)) {
+            if (Double.isInfinite(end)) {
+                x = 0;
+            } else {
+                x = end - 1;
+            }
+        } else {
+            if (Double.isInfinite(end)) {
+                x = begin + 1;
+            } else {
+                x = (begin + end) / 2;
+            }
+        }
+        return x;
     }
 
     private List<Double> getCriticalPoints() {

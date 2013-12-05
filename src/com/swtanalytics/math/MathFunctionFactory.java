@@ -10,7 +10,7 @@ public class MathFunctionFactory {
     }
 
     public MathFunction create(boolean forceWholeNumberCoefficients, boolean forceLinearFunction) {
-        return create(forceWholeNumberCoefficients, randomGenerator.generateInt(1, 5), forceLinearFunction ? 1 : 10, forceLinearFunction);
+        return create(forceWholeNumberCoefficients, randomGenerator.generateInt(1, 5), forceLinearFunction ? 1 : 100, forceLinearFunction);
     }
 
     public MathFunction create(boolean forceWholeNumberCoefficients, int termCount, int maxDegree, boolean strictDegree) {
@@ -26,7 +26,7 @@ public class MathFunctionFactory {
 
         for (int j = 1; j < termCount; ++j) {
             // TODO: Should this check for duplicates, so that we can provide exactly the requested number of terms?
-            Term t = termFactory.create(forceWholeNumberCoefficients, maxDegree);
+            Term t = termFactory.create(forceWholeNumberCoefficients, strictDegree ? maxDegree - 1 : maxDegree);
             result.addTerm(t);
         }
 
