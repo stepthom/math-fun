@@ -3,7 +3,7 @@ math-fun
 
 Just testing out some fun with mathematics.
 
-Initially, the goal of this package will be to randomly generate (and print to stdout) a set of
+Initially, the goal of this package will be to randomly generate (and print to stdout as xml) a set of
 functions of the form:
 
 ```
@@ -40,7 +40,6 @@ where the options are:
 - `-d`: Print the derivative of each function, too. (Default: off)
 - `-i`: Print the integral of each function as well. (Default: off)
 - `-f`: Generate fractional coefficients and exponents. (Default: off)
-- `-x`: Format output as XML. (Default: off)
 - `-l`: Create only strictly first-degree linear functions. (Default: off)
 - `--domain-min NUM`: Domain minimum, for min/max calculations. (Default: -Infinity)
 - `--domain-max NUM`: Domain maximum, for min/max calculations. (Default: +Infinity)
