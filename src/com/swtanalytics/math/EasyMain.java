@@ -33,9 +33,6 @@ public class EasyMain {
     @Option(name="-f", usage="Experiment with Fractions.")
     public boolean isFractions = false;
 
-    @Option(name="-x", usage="Format output as XML.")
-    public boolean outputXml = false;
-
     @Option(name="-i", usage="Print integrals too.")
     public boolean isPrintIntegral = false;
 
@@ -69,26 +66,8 @@ public class EasyMain {
     protected String getFunctionString(MathFunction mf, int i, FunctionType type) {
     	StringBuilder functionString = new StringBuilder();
     	
-    	// If we're outputting xml, indent and omit the labels printed for the standard output format
-    	if (outputXml) {
-            functionString.append("      ").append(mf);
-    	}
-    	else
-    	{
-        	if (type == FunctionType.DIFFERENTIAL) {
-                functionString.append("Differential ");
-            }
-        	else if (type == FunctionType.INTEGRAL) {
-                functionString.append("Integral ");
-            }
-    		
-            functionString.append(String.format("Function %d:\n", i));
-            functionString.append(mf);
-            
-            if (type == FunctionType.INTEGRAL) {
-            	functionString.append("+ constant");
-            }
-    	}
+    	// Use indentation appropriate for printing an xml rendition of the output.
+    	functionString.append("      ").append(mf);
 
         functionString.append("\n");
 
@@ -96,9 +75,7 @@ public class EasyMain {
     }
 
     public void printFunction(MathFunction mf, int i) {
-    	if (outputXml) {
-    		System.out.println("  <function>");
-    	}
+    	System.out.println("  <function>");
 
     	printFunction(mf, i, FunctionType.NORMAL);
 
@@ -118,18 +95,14 @@ public class EasyMain {
         
         printIntercepts(mf);
 
-    	if (outputXml) {
-    		System.out.println("  </function>");
-    	}
+    	System.out.println("  </function>");
     }
 
     private void printSlope(Fraction slope) {
-        if (outputXml) {
-            System.out.println("    <slope>");
-            System.out.print("      ");
-            System.out.println(slope.formatString(true, false));
-            System.out.println("    </slope>");
-        }
+    	System.out.println("    <slope>");
+    	System.out.print("      ");
+    	System.out.println(slope.formatString(true, false));
+    	System.out.println("    </slope>");
     }
 
     private void printMinMax(MathFunction function) {
@@ -137,7 +110,7 @@ public class EasyMain {
             double minX = function.findMinimum(domainMin, domainMax);
             double minY = function.evaluate(minX);
             if (!Double.isNaN(minX) && !Double.isNaN(minY)) {
-                System.out.format(outputXml ? "    <min>(%f, %f)</min>%n" : "Min:(%f, %f)%n", minX, minY);
+                System.out.format("    <min>(%f, %f)</min>%n", minX, minY);
             }
         } catch (UnsupportedOperationException e) {
         }
@@ -146,19 +119,19 @@ public class EasyMain {
             double maxX = function.findMaximum(domainMin, domainMax);
             double maxY = function.evaluate(maxX);
             if (!Double.isNaN(maxX) && !Double.isNaN(maxY)) {
-                System.out.format(outputXml ? "    <max>(%f, %f)</max>%n" : "Max:(%f, %f)%n", maxX, maxY);
+                System.out.format("    <max>(%f, %f)</max>%n", maxX, maxY);
             }
         } catch (UnsupportedOperationException e) {
         }
     }
 
     private void printIntercepts(MathFunction function) {
-        System.out.format(outputXml ? "    <y-intercept>%f</y-intercept>%n" : "Y-intercept:%f%n", function.evaluate(0));
+        System.out.format("    <y-intercept>%f</y-intercept>%n", function.evaluate(0));
 
         try {
             for (double solution : function.solve())
             {
-                System.out.format(outputXml ? "    <x-intercept>%f</x-intercept>%n" : "X-intercept:%f%n", solution);
+                System.out.format("    <x-intercept>%f</x-intercept>%n", solution);
             }
         } catch (UnsupportedOperationException e) {
         }
@@ -167,36 +140,32 @@ public class EasyMain {
     protected void printFunction(MathFunction mf, int i, FunctionType type) {
     	StringBuilder outputString = new StringBuilder();
     	
-    	// Decorate with xml if xml output was specified
-    	if (outputXml) {
-    		switch (type) {
-	    		case NORMAL:
-	    			outputString.append("    <output>\n");
-	    			break;
-	    		case DIFFERENTIAL:
-	    			outputString.append("    <derivative>\n");
-	    			break;
-	    		case INTEGRAL:
-	    			outputString.append("    <integral>\n");
-	    			break;
-    		}
+    	// Decorate with xml
+    	switch (type) {
+    	case NORMAL:
+    		outputString.append("    <output>\n");
+    		break;
+    	case DIFFERENTIAL:
+    		outputString.append("    <derivative>\n");
+    		break;
+    	case INTEGRAL:
+    		outputString.append("    <integral>\n");
+    		break;
     	}
     	
     	outputString.append(getFunctionString(mf, i, type));
 
-    	// Decorate with xml if xml output was specified
-    	if (outputXml) {
-    		switch (type) {
-    		case NORMAL:
-    			outputString.append("    </output>\n");
-    			break;
-    		case DIFFERENTIAL:
-    			outputString.append("    </derivative>\n");
-    			break;
-    		case INTEGRAL:
-    			outputString.append("    </integral>\n");
-    			break;
-    		}
+    	// Decorate with xml
+    	switch (type) {
+    	case NORMAL:
+    		outputString.append("    </output>\n");
+    		break;
+    	case DIFFERENTIAL:
+    		outputString.append("    </derivative>\n");
+    		break;
+    	case INTEGRAL:
+    		outputString.append("    </integral>\n");
+    		break;
     	}
     	
     	System.out.print(outputString.toString());
@@ -204,20 +173,14 @@ public class EasyMain {
 
     // The main logic loop
     public void run() {
-    	if (outputXml)
-    	{
-    		System.out.println("<functions>");
-    	}
+    	System.out.println("<functions>");
 
     	for (int i=0; i<this.numMathFunctions;++i){
             MathFunction mf = functionFactory.create(!this.isFractions, this.forceLinearFunctions);
             printFunction(mf, i);
         }
 
-    	if (outputXml)
-    	{
-    		System.out.println("</functions>");
-    	}
+    	System.out.println("</functions>");
     }
 
     public static void main(String[] args) throws IOException {
