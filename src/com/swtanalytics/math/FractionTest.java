@@ -194,5 +194,9 @@ public class FractionTest {
     	// These exercise value-specific code paths within Fraction.equals...
     	Assert.assertNotEquals( wholeVeryNeg, Integer.MIN_VALUE );
     	Assert.assertNotEquals( wholeVeryNeg, Long   .MIN_VALUE );
+
+    	// These are to make sure that false is returned, rather than an exception being thrown...
+    	Assert.assertNotEquals( whole, null );
+    	Assert.assertNotEquals( whole, new String("Hello, World!") );
     }
 }
