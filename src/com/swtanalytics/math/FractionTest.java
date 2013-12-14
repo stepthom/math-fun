@@ -171,13 +171,5 @@ public class FractionTest {
     	Fraction potentialIntUnderflow = minNegIntFraction.multiply( new Fraction(2) );
     	Assert.assertEquals( BAD_CAN_HANDLE_BIG_NUMBERS_MSG,
     						 minNegIntFraction.compareTo( potentialIntUnderflow ), 1 );
-
-    	// Concoct a Fraction whose value is even larger than a 'double' can represent, and then
-    	// call its doubleValue method.  (Actoally, check the Issue writeup.  Should I even be 
-    	// still providig a toDouble method?  And if so, what do I do with a value that would indicate
-    	// double overflow / underflow / nan / inf / etc.?
-    	
     }
-
-
 }

@@ -187,9 +187,11 @@ public class Fraction implements Comparable<Fraction> {
 
     @Override
     public int hashCode() {
-    	// Every mathematically distinct fraction maps to a unique (numerator, denominator) pair,
+    	// Every mathematically distinct Fraction maps to a unique (numerator, denominator) pair,
     	// thanks to this class's constructors.  So there are no concerns about equivalent Fractions
     	// getting distinct hashcodes using the following formula.
+    	//
+    	// NOTE: This hashing algorithm is not carefully tuned.
     	return numerator.hashCode() + denominator.hashCode();
     }
 }
