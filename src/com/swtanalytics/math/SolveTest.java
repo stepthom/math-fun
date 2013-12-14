@@ -4,6 +4,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
+import java.math.MathContext;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -57,7 +58,7 @@ public class SolveTest {
             function.addTerm(term);
         }
         System.out.println(function.toString());
-        List<Double> solutionsList = function.solve();
+        List<Double> solutionsList = function.solve( MathContext.DECIMAL128 );
         System.out.println(solutionsList.toString());
 
         // Java is really annoying sometimes :-P

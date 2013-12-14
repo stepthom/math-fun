@@ -1,5 +1,9 @@
 package com.swtanalytics.math;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.math.MathContext;
+
 public class Term implements Comparable<Term> {
 
     protected Fraction coefficient;
@@ -30,7 +34,7 @@ public class Term implements Comparable<Term> {
     }
 
     protected String formatString(boolean isFirstTerm) {
-        if (this.coefficient.numerator == 0) {
+        if (this.coefficient.sign == 0) {
             return "";
         }
 
@@ -42,9 +46,9 @@ public class Term implements Comparable<Term> {
 
     private String formatVariablePart() {
         String variablePart;
-        if (this.exponent.numerator == 0) {
+        if (this.exponent.sign == 0) {
             variablePart = "";
-        } else if (this.exponent.numerator == this.exponent.denominator) {
+        } else if (this.exponent.equals( new Fraction(1,1) )) {
             variablePart = "x";
         } else {
             variablePart = "x^" + this.exponent.formatString(true, false);
@@ -54,7 +58,7 @@ public class Term implements Comparable<Term> {
     }
 
     private String formatCoefficientPart(boolean isFirstTerm) {
-        return this.coefficient.numerator == this.coefficient.denominator
+        return this.coefficient.equals( new Fraction(1,1) )
                 ? ""
                 : this.coefficient.formatString(isFirstTerm, !isFirstTerm);
     }
@@ -68,14 +72,18 @@ public class Term implements Comparable<Term> {
         return this.exponent.compareTo(t.exponent);
     }
 
-    public double evaluate(double value) {
-        double returnValue = 0d;
-
-        returnValue = Math.pow(value, exponent.doubleValue()) * coefficient.doubleValue();
+    // NOTE: The Java SDK provides no pow(...) function for BigDecimal or BigInteger objects, which
+    // are what the Fraction class uses to support unbounded-precision fractions.
+    // Therefore, for practical purposes, we switch to using 64-bit double precision numbers here.
+    // A future enhancement might be to implement pow(...) support to the Fraction class, but that's
+    // beyond the scope of the current effort.
+    public double evaluate(double value, MathContext mc) {
+        double returnValue = Math.pow(value, exponent.bigDecimalValue(mc).doubleValue()) * 
+        			  coefficient.bigDecimalValue(mc).doubleValue();
 
         return returnValue;
     }
-
+    
     public Term add(Term toAdd) {
         if (!exponent.equals(toAdd.exponent)) {
             throw new IllegalArgumentException("Exponents must match in order to add terms.");

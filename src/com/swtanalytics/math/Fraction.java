@@ -1,139 +1,195 @@
 package com.swtanalytics.math;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.math.MathContext;
+
 public class Fraction implements Comparable<Fraction> {
-    protected int numerator;
-    protected int denominator;
+    protected final BigInteger numerator;
+    protected final BigInteger denominator;
+    
+    // -1, 0, or 1, depending on whether the Fraction is less than, equal to, or greater than zero,
+    // respectively.
+    protected final int sign;    
+    protected final boolean isWhole;
 
-    public Fraction(int n, int d) {
-        if (d == 0) {
+    protected static final BigInteger bigZero   = BigInteger.valueOf(  0 );
+    protected static final BigInteger bigOne    = BigInteger.valueOf(  1 );
+    
+    
+    public Fraction(BigInteger n, BigInteger d) {
+    	int nSign = n.compareTo( bigZero );
+    	int dSign = d.compareTo( bigZero );
+    	
+    	this.sign = nSign * dSign;
+
+    	if (dSign == 0) {
             throw new IllegalArgumentException("Argument 'd' is 0");
-        }
+    	}
 
-        // Short circuit gcf if we have a 0 numerator
-        if (n != 0) {
-            int g = gcf(n, d);
-            this.numerator = n / g;
-            this.denominator = d / g;
-        } else {
-            this.numerator = n;
-            this.denominator = d;
-        }
-
-        // Fix the sign of the numerator and denominator if the gcf is
-        // negative. We may only need to check and fix the denominator
-        // sign here...
-        if (this.numerator > 0 && this.denominator < 0) {
-            this.numerator *= -1;
-            this.denominator *= -1;
-        }
+    	if (nSign == 0) {
+    		this.numerator = bigZero;
+    		this.denominator = bigOne;
+    		this.isWhole = true;
+    	}
+    	else {
+	        BigInteger g = n.gcd( d );
+	        BigInteger tempNumerator = n.divide( g );
+	        BigInteger tempDenominator = d.divide( g );
+	        
+	        if (dSign == -1) {
+				numerator = tempNumerator.negate();
+				denominator = tempDenominator.negate();
+	        }
+	        else { // dSign == 1
+				numerator = tempNumerator;
+				denominator = tempDenominator;
+	        }
+	        
+	        isWhole = denominator.equals(bigOne);
+    	}
+    }
+    
+    public Fraction(int n, int d) {
+    	this( BigInteger.valueOf(n), BigInteger.valueOf(d) );
     }
 
     public Fraction(int whole)
     {
-        this.numerator = whole;
-        this.denominator = 1;
+    	this( BigInteger.valueOf( whole ) );
+    }
+
+    public Fraction(BigInteger whole)
+    {
+    	this( whole, bigOne );
     }
 
     public String toString() {
-        int n = this.numerator;
-        int d = Math.abs(this.denominator);
-        if (this.denominator < 0) {
-            n *= -1;
-        }
-
-        String result = String.format("%+d", n);
-
-        // Collapse into integer
-        if (d != 1) {
-            result = String.format("%s/%d", result, d);
-        }
-
-        return result;
+    	return formatString( false, false );
     }
 
     public String formatString(boolean stripSignIfZeroOrGreater, boolean spaceAfterCoefficientSign) {
-        int n = this.numerator;
-        int d = Math.abs(this.denominator);
+    	StringBuilder result = new StringBuilder();
+    	
+    	if (this.sign == -1) {
+    		result.append('-');
+    	}
+    	else if (! stripSignIfZeroOrGreater) {
+    		result.append('+');
+    	}
+    	
+    	if (spaceAfterCoefficientSign && (result.length() > 0)) {
+    		result.append(' ');
+    	}
 
-        boolean isZeroOrGreater = this.numerator * this.denominator >= 0;
-        String sign = isZeroOrGreater
-                ? "+"
-                : "-";
+    	result.append( numerator.abs().toString() );
+    	
+    	if (! isWhole()) {
+    		result.append( '/' );
+    		result.append( denominator.toString() );
+    	}
 
-        String numeratorPart;
-        if (isZeroOrGreater && stripSignIfZeroOrGreater) {
-            numeratorPart = String.format("%d", Math.abs(n));
-        } else if (spaceAfterCoefficientSign) {
-            numeratorPart = String.format("%s %d", sign, Math.abs(n));
-        } else {
-            numeratorPart = String.format("%s%d", sign, Math.abs(n));
-        }
-
-        // Collapse into integer
-        if (d != 1) {
-            return String.format("%s/%d", numeratorPart, d);
-        }
-
-        return numeratorPart;
+        return result.toString();
     }
 
     public boolean isWhole() {
-        return Math.abs(denominator) == 1;
+    	return denominator.equals( bigOne );
     }
 
-    public int wholePart() {
-        return numerator / denominator;
+    public BigInteger wholePart() {
+        return numerator.divide( denominator );
     }
 
-    public double doubleValue() {
-        return new Double(this.numerator) / this.denominator;
+    /**
+     * @param mc Used in intermediate calculations to compute the return value.
+     */
+    public BigDecimal bigDecimalValue( MathContext mc ) {
+    	BigDecimal bdNum   = new BigDecimal( this.numerator,   0, mc );
+    	BigDecimal bdDenom = new BigDecimal( this.denominator, 0, mc );
+    	
+    	return bdNum.divide( bdDenom, mc );
     }
-
+    
     public int compareTo(Fraction f) {
-        return new Double(this.doubleValue()).compareTo(f.doubleValue());
+    	// We can efficiently handle the cases where the two fractions are in separate
+    	// regions of the number line...
+    	if (this.sign < f.sign) {
+    		return -1;
+    	}
+    	else if (this.sign > f.sign) {
+    		return 1;
+    	}
+    	
+    	if ((this.sign == 0) && (f.sign == 0)) {
+    		return 0;
+    	}
+    	
+    	// If we got here, then both fractions are negative or both are positive.  We can multiply 
+    	// both 'this' and 'f' by (this.denominator * f.denominator), for the following reasons:
+    	// - Because this class ensures that denominators are positive, that multiplication won't
+    	//   affect the sign of either fraction.
+    	// - Because we're multiplying both fractions by the same value, the new fractions will have
+    	//   the same relationship (less-than or greater-than) as the fractions on which they're 
+    	//   based.
+    	//
+    	// Both of these new fractions will have a denominator of '1', meaning we can get our final 
+    	// answer by simply comparing the new fractions' numerators.  Thus we avoid a potentially 
+    	// slow and error-introducing floating-point conversion...
+    	BigInteger a = this.numerator.multiply( f   .denominator );
+    	BigInteger b = f   .numerator.multiply( this.denominator );
+    	return a.compareTo( b );
     }
 
-    public Fraction add(Fraction toAdd) {
-        int n = this.numerator * toAdd.denominator + toAdd.numerator * this.denominator;
-        int d = this.denominator * toAdd.denominator;
+    public Fraction add(Fraction f) {
+    	BigInteger n = this.numerator.multiply( f   .denominator ).add(
+    			       f   .numerator.multiply( this.denominator ));
+    	
+    	BigInteger d = this.denominator.multiply( f.denominator );
+    	
         return new Fraction(n, d);
     }
 
     public Fraction subtract(Fraction f) {
-        int n = this.numerator * f.denominator - f.numerator * this.denominator;
-        int d = this.denominator * f.denominator;
-        return new Fraction(n, d);
+    	BigInteger n = this.numerator.multiply( f   .denominator ).subtract(
+			           f   .numerator.multiply( this.denominator ));
+	
+    	BigInteger d = this.denominator.multiply( f.denominator );
+	
+    	return new Fraction(n, d);
     }
 
     public Fraction multiply(Fraction f) {
-        return new Fraction(this.numerator * f.numerator, this.denominator * f.denominator);
-    }
-
-    private int gcf(int a, int b) {
-        // TODO: In theory, gcf behavior should be undefined when one of the operands is 0.
-        // Should this throw an error?
-        int rem = 0;
-        int gcf = 0;
-        do {
-            rem = a % b;
-            if (rem == 0)
-                gcf = b;
-            else {
-                a = b;
-                b = rem;
-            }
-        } while (rem != 0);
-
-        return gcf;
+        return new Fraction(this.numerator  .multiply( f.numerator ), 
+        					this.denominator.multiply( f.denominator) );
     }
 
     @Override
     public boolean equals(Object o) {
-        return compareTo((Fraction) o) == 0;
+    	if (this == o) {
+    		return true;
+    	}
+    	
+    	if (! ( o instanceof Fraction)) {
+    		return false;
+    	}
+    	
+    	// Try the cheap comparisons before the expensive ones...
+    	Fraction f = (Fraction) o;
+    	if (this.sign != f.sign) {
+    		return false;
+    	}
+    	    	
+    	// Every mathematically distinct fraction maps to a unique (numerator, denominator) pair,
+    	// thanks to this class's constructors...
+    	return this.numerator  .equals(f.numerator  ) && 
+    		   this.denominator.equals(f.denominator);
     }
 
     @Override
     public int hashCode() {
-        return new Double(doubleValue()).hashCode();
+    	// Every mathematically distinct fraction maps to a unique (numerator, denominator) pair,
+    	// thanks to this class's constructors.  So there are no concerns about equivalent Fractions
+    	// getting distinct hashcodes using the following formula.
+    	return numerator.hashCode() + denominator.hashCode();
     }
 }

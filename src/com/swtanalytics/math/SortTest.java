@@ -1,5 +1,7 @@
 package com.swtanalytics.math;
 
+import java.math.MathContext;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -21,6 +23,7 @@ public class SortTest {
 
     @Test
     public void testSort() {
+    	MathContext mc = MathContext.DECIMAL128;
 
         // Create a new math function and add the test terms to it in order
         MathFunction mf = new MathFunction();
@@ -37,7 +40,8 @@ public class SortTest {
                 firstTerm = false;
             } else {
                Assert.assertTrue(BAD_SORT_MSG,
-                                 lastExp.doubleValue() >= t.exponent.doubleValue());
+                                 lastExp.bigDecimalValue(mc).doubleValue() >= 
+                                 t.exponent.bigDecimalValue(mc).doubleValue());
             }
             lastExp = t.exponent;
         }
