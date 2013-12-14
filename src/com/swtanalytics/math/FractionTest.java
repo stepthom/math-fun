@@ -172,4 +172,33 @@ public class FractionTest {
     	Assert.assertEquals( BAD_CAN_HANDLE_BIG_NUMBERS_MSG,
     						 minNegIntFraction.compareTo( potentialIntUnderflow ), 1 );
     }
+    
+    @Test
+    public void testEquals() {
+    	Fraction whole        = new Fraction( 2, 1 );
+    	Fraction notWhole     = new Fraction( 3, 4 );
+    	Fraction wholeVeryNeg = new Fraction( BigInteger.valueOf( Integer.MIN_VALUE - 1) );
+    	
+    	Assert.assertEquals   ( whole,    new Integer(2) );
+    	Assert.assertNotEquals( notWhole, new Integer(2) );
+    	Assert.assertNotEquals( whole,    new Integer(3) );
+    	
+    	Assert.assertEquals   ( whole,    new Long(2) );
+    	Assert.assertNotEquals( notWhole, new Long(2) );
+    	Assert.assertNotEquals( whole,    new Long(3) );
+    	
+    	Assert.assertEquals   ( whole,    BigInteger.valueOf(2) );
+    	Assert.assertNotEquals( notWhole, BigInteger.valueOf(2) );
+    	Assert.assertNotEquals( whole,    BigInteger.valueOf(3) );
+
+    	Assert.assertEquals   ( whole,    whole );
+    	Assert.assertEquals   ( whole,    new Fraction(2, 1) );
+    	Assert.assertEquals   ( whole,    new Fraction(4, 2) );
+    	Assert.assertEquals   ( notWhole, notWhole );
+    	Assert.assertNotEquals( whole,    notWhole );
+    	
+    	// These exercise value-specific code paths within Fraction.equals...
+    	Assert.assertNotEquals( wholeVeryNeg, Integer.MIN_VALUE );
+    	Assert.assertNotEquals( wholeVeryNeg, Long   .MIN_VALUE );
+    }
 }
