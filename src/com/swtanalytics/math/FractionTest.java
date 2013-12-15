@@ -1,5 +1,6 @@
 package com.swtanalytics.math;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.MathContext;
 
@@ -194,5 +195,96 @@ public class FractionTest {
     	Fraction f1 = new Fraction( Long.MAX_VALUE );
     	Fraction f2 = f1.multiply(new Fraction(2, 1));
     	f2.longValue();
+    }
+
+    @Test
+    public void testDivide() {
+    	Fraction f1 = new Fraction(2, 3);
+    	Fraction f2 = new Fraction(3, 2);
+    	
+    	Assert.assertEquals( f1.divide(f1), new Fraction( 1 ));
+    	Assert.assertEquals( f1.divide(f2), new Fraction( 4, 9 ));
+    }
+    
+    @Test 
+    public void testNegate() {
+    	Assert.assertEquals( new Fraction( 2, 3).negate(), new Fraction(-2, 3) );
+    	Assert.assertEquals( new Fraction(-2, 3).negate(), new Fraction( 2, 3) );
+    	Assert.assertEquals( new Fraction( 0, 1).negate(), new Fraction( 0, 1) );
+    }
+    
+    @Test 
+    public void testInvert() {
+    	Assert.assertEquals( new Fraction( 2, 3).invert(), new Fraction( 3, 2) );
+    	Assert.assertEquals( new Fraction(-2, 3).invert(), new Fraction(-3, 2) );
+    }
+
+    @Test(expected= java.lang.ArithmeticException.class)
+    public void testInvertError() {
+    	new Fraction(0, 1).invert();
+    }
+    
+    @Test
+    public void testSign() {
+    	Assert.assertEquals( new Fraction( 2, 3).sign(),  1 );
+    	Assert.assertEquals( new Fraction( 0, 1).sign(),  0 );
+    	Assert.assertEquals( new Fraction(-2, 3).sign(), -1 );
+    }
+    
+    @Test
+    public void testAbs() {
+    	Assert.assertEquals( new Fraction( 2, 3).abs(), new Fraction(2, 3) );
+    	Assert.assertEquals( new Fraction(-2, 3).abs(), new Fraction(2, 3) );
+    	Assert.assertEquals( new Fraction( 0, 1).abs(), new Fraction(0, 1) );
+    }
+    
+    @Test
+    public void testGeometricAbs() {
+    	Fraction f1 = new Fraction( 10, 3 );
+    	Fraction f2 = new Fraction( 12, 3 );
+    	
+    	Assert.assertEquals( f1.geometricAbs(f2), new Fraction(2, 3) );
+    	Assert.assertEquals( f2.geometricAbs(f1), new Fraction(2, 3) );
+    }
+    
+    @Test
+    public void testFloor() {
+    	Assert.assertEquals( new Fraction( 20, 3).floor(), BigInteger.valueOf( 6) );
+    	Assert.assertEquals( new Fraction( 21, 3).floor(), BigInteger.valueOf( 7) );
+    	Assert.assertEquals( new Fraction(-20, 3).floor(), BigInteger.valueOf(-7) );
+    	Assert.assertEquals( new Fraction(-21, 3).floor(), BigInteger.valueOf(-7) );
+    	Assert.assertEquals( new Fraction(  0, 3).floor(), BigInteger.valueOf( 0) );
+    }
+
+    @Test
+    public void testCeil() {
+        Assert.assertEquals( new Fraction( 20, 3).ceil(), BigInteger.valueOf( 7) );
+       	Assert.assertEquals( new Fraction( 21, 3).ceil(), BigInteger.valueOf( 7) );
+    	Assert.assertEquals( new Fraction(-20, 3).ceil(), BigInteger.valueOf(-6) );
+    	Assert.assertEquals( new Fraction(-21, 3).ceil(), BigInteger.valueOf(-7) );
+    	Assert.assertEquals( new Fraction(  0, 3).ceil(), BigInteger.valueOf( 0) );
+    }
+    
+    @Test
+    public void testRound() {
+    	Assert.assertEquals( new Fraction(  9, 3).round(), BigInteger.valueOf( 3) );
+    	Assert.assertEquals( new Fraction( 10, 3).round(), BigInteger.valueOf( 3) );
+    	Assert.assertEquals( new Fraction( 11, 3).round(), BigInteger.valueOf( 4) );
+    	Assert.assertEquals( new Fraction( -9, 3).round(), BigInteger.valueOf(-3) );
+    	Assert.assertEquals( new Fraction(-10, 3).round(), BigInteger.valueOf(-3) );
+    	Assert.assertEquals( new Fraction(-11, 3).round(), BigInteger.valueOf(-4) );
+    	Assert.assertEquals( new Fraction(  0, 3).round(), BigInteger.valueOf( 0) );
+    }
+    
+    @Test
+    public void testPow() {
+
+    	float epsilon = 0.01f;
+    	
+    	Fraction x = new Fraction(2, 1);
+    	Fraction y = new Fraction(10, 1);
+    	BigDecimal p = x.pow(y, MathContext.DECIMAL128);
+    	
+    	Assert.assertEquals( p.doubleValue(), 1024.0, epsilon );
     }
 }

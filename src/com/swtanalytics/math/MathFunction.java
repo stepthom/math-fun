@@ -62,7 +62,7 @@ public class MathFunction {
             for (Term t : termsByExponent.values()) {
                 // XXX This will make uncollapsed x^0 and x^1 terms in the
                 //     Style of the original class.
-                if (t.exponent.sign != 0) {
+                if (t.exponent.sign() != 0) {
                     Term dt = new Term(t.coefficient.multiply(t.exponent), t.exponent.subtract(new Fraction(1, 1)));
                     cachedDerivative.addTerm(dt);
                 }
