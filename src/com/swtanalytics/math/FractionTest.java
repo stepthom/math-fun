@@ -172,4 +172,27 @@ public class FractionTest {
     	Assert.assertEquals( BAD_CAN_HANDLE_BIG_NUMBERS_MSG,
     						 minNegIntFraction.compareTo( potentialIntUnderflow ), 1 );
     }
+    
+    @Test
+    public void testValidConversions() {
+    	Assert.assertEquals( new Fraction(42).intValue(), 42 );
+    	Assert.assertEquals( new Fraction(42L).longValue(), 42L );
+
+    	float epsilon = 0.01f;
+    	
+    	Assert.assertEquals( new Fraction(42).floatValue(MathContext.DECIMAL128), 42.0f, epsilon );
+    	Assert.assertEquals( new Fraction(42).doubleValue(MathContext.DECIMAL128), 42.0d, epsilon );
+    }    
+    
+    @Test(expected= java.lang.ArithmeticException.class)
+    public void testInvalidIntConversion() {
+    	new Fraction( new Long(Long.MAX_VALUE)).intValue();
+    }
+    
+    @Test(expected= java.lang.ArithmeticException.class)
+    public void testInvalidLongConversion() {
+    	Fraction f1 = new Fraction( Long.MAX_VALUE );
+    	Fraction f2 = f1.multiply(new Fraction(2, 1));
+    	f2.longValue();
+    }
 }

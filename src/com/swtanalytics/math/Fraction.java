@@ -11,11 +11,23 @@ public class Fraction implements Comparable<Fraction> {
     // -1, 0, or 1, depending on whether the Fraction is less than, equal to, or greater than zero,
     // respectively.
     protected final int sign;    
-    protected final boolean isWhole;
-
-    protected static final BigInteger bigZero   = BigInteger.valueOf(  0 );
-    protected static final BigInteger bigOne    = BigInteger.valueOf(  1 );
     
+    protected final boolean isWholeFlag;
+
+    private static final BigInteger bigZero = BigInteger.valueOf( 0 );
+    private static final BigInteger bigOne = BigInteger.valueOf( 1 );
+
+    private static final BigInteger bigMinInt = BigInteger.valueOf( Integer.MIN_VALUE );
+    private static final BigInteger bigMaxInt = BigInteger.valueOf( Integer.MAX_VALUE );
+
+    private static final BigInteger bigMinLong = BigInteger.valueOf( Long.MIN_VALUE );
+    private static final BigInteger bigMaxLong = BigInteger.valueOf( Long.MAX_VALUE );
+
+    private static final BigDecimal bigMinFloat = BigDecimal.valueOf( Float.MIN_VALUE );
+    private static final BigDecimal bigMaxFloat = BigDecimal.valueOf( Float.MAX_VALUE );
+
+    private static final BigDecimal bigMinDouble = BigDecimal.valueOf( Double.MIN_VALUE );
+    private static final BigDecimal bigMaxDouble = BigDecimal.valueOf( Double.MAX_VALUE );
     
     public Fraction(BigInteger n, BigInteger d) {
     	int nSign = n.compareTo( bigZero );
@@ -30,7 +42,7 @@ public class Fraction implements Comparable<Fraction> {
     	if (nSign == 0) {
     		this.numerator = bigZero;
     		this.denominator = bigOne;
-    		this.isWhole = true;
+    		this.isWholeFlag = true;
     	}
     	else {
 	        BigInteger g = n.gcd( d );
@@ -46,15 +58,24 @@ public class Fraction implements Comparable<Fraction> {
 				denominator = tempDenominator;
 	        }
 	        
-	        isWhole = denominator.equals(bigOne);
+	        isWholeFlag = denominator.equals(bigOne);
     	}
     }
     
-    public Fraction(int n, int d) {
+    public Fraction(Integer n, Integer d) {
+    	this( BigInteger.valueOf(n), BigInteger.valueOf(d) );
+    }
+    
+    public Fraction(Long n, Long d) {
     	this( BigInteger.valueOf(n), BigInteger.valueOf(d) );
     }
 
-    public Fraction(int whole)
+    public Fraction(Integer whole)
+    {
+    	this( BigInteger.valueOf( whole ) );
+    }
+
+    public Fraction(Long whole)
     {
     	this( BigInteger.valueOf( whole ) );
     }
@@ -84,7 +105,7 @@ public class Fraction implements Comparable<Fraction> {
 
     	result.append( numerator.abs().toString() );
     	
-    	if (! isWhole()) {
+    	if (! isWholeFlag) {
     		result.append( '/' );
     		result.append( denominator.toString() );
     	}
@@ -93,16 +114,93 @@ public class Fraction implements Comparable<Fraction> {
     }
 
     public boolean isWhole() {
-    	return denominator.equals( bigOne );
+    	return this.isWholeFlag;
     }
-
+    
     public BigInteger wholePart() {
         return numerator.divide( denominator );
     }
-
+    
+    private static boolean canBeInt( BigInteger val ) {
+    	return (val.compareTo(bigMinInt) >= 0) &&
+     		   (val.compareTo(bigMaxInt) <= 0);
+    }
+    
+    private static boolean canBeLong( BigInteger val ) {
+    	return (val.compareTo(bigMinLong) >= 0) &&
+     		   (val.compareTo(bigMaxLong) <= 0);
+    }
+    
+    private static boolean canBeFloat( BigDecimal val ) {
+    	return ( val.compareTo(bigMinFloat) >= 0) &&
+      		   ( val.compareTo(bigMaxFloat) <= 0);
+    }
+    
+    private static boolean canBeDouble( BigDecimal val ) {
+    	return ( val.compareTo(bigMinDouble) >= 0) &&
+      		   ( val.compareTo(bigMaxDouble) <= 0);
+    }
+    
     /**
-     * @param mc Used in intermediate calculations to compute the return value.
+     * If this Fraction represents a whole number which fits in a Java @c int, this returns that
+     * int.  Otherwise an exception is thrown.
      */
+    public int intValue() {
+    	if (! isWholeFlag) {
+    		throw new ArithmeticException( "Can't cast a non-whole Fraction to a scalar type." );
+    	}
+
+    	if (! canBeInt(numerator)) {
+    		throw new ArithmeticException( "Fraction's value lies outside the range supported by 'int'" );
+    	}
+    	
+    	return numerator.intValue();
+    }
+    
+    /**
+     * If this Fraction represents a whole number which fits in a Java @c long, this returns that
+     * long.  Otherwise an exception is thrown.
+     */
+    public long longValue() {
+    	if (! isWholeFlag) {
+    		throw new ArithmeticException( "Can't cast a non-whole Fraction to a scalar type." );
+    	}
+
+    	if (! canBeLong(numerator)) {
+    		throw new ArithmeticException( "Fraction's value lies outside the range supported by 'long'" );
+    	}
+    	
+    	return numerator.longValue();
+    }
+    
+    /**
+     * If this Fraction represents a whole number which fits in a Java @c float, this returns that
+     * float.  Otherwise an exception is thrown.
+     */
+    public float floatValue(MathContext mc) {
+    	BigDecimal ratio = bigDecimalValue( mc );
+    	
+    	if (! canBeFloat(ratio)) {
+    		throw new ArithmeticException( "Fraction's value lies outside the range supported by 'float'" );
+    	}
+    	
+    	return ratio.floatValue();
+    }
+    
+    /**
+     * If this Fraction represents a whole number which fits in a Java @c double, this returns that
+     * double.  Otherwise an exception is thrown.
+     */
+    public double doubleValue(MathContext mc) {
+    	BigDecimal ratio = bigDecimalValue( mc );
+    	
+    	if (! canBeDouble(ratio)) {
+    		throw new ArithmeticException( "Fraction's value lies outside the range supported by 'double'" );
+    	}
+    	
+    	return ratio.doubleValue();
+    }
+    
     public BigDecimal bigDecimalValue( MathContext mc ) {
     	BigDecimal bdNum   = new BigDecimal( this.numerator,   0, mc );
     	BigDecimal bdDenom = new BigDecimal( this.denominator, 0, mc );
