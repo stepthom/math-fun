@@ -278,7 +278,6 @@ public class FractionTest {
     
     @Test
     public void testPow() {
-
     	float epsilon = 0.01f;
     	
     	Fraction x = new Fraction(2, 1);
@@ -286,5 +285,17 @@ public class FractionTest {
     	BigDecimal p = x.pow(y, MathContext.DECIMAL128);
     	
     	Assert.assertEquals( p.doubleValue(), 1024.0, epsilon );
+    }
+
+    @Test(expected= java.lang.NumberFormatException.class)
+    public void testPowInternalOverflow() {
+    	// We don't use exactly Double.MAX_VALUE, because it seems that when we convert that to
+    	// a BigDecimal, we get something that lies slightly outside the range of a double.  That
+    	// causes this test to fail for a different reason than we intend.
+    	Fraction base = new Fraction( new BigDecimal( Double.MAX_VALUE / 2.0, MathContext.DECIMAL128 ).toBigInteger(), 
+    							      BigInteger.valueOf( 1 ) );
+    	
+    	Fraction exp = new Fraction( 10000, 1 );
+    	base.pow( exp, MathContext.DECIMAL128 );
     }
 }

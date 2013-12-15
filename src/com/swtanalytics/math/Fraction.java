@@ -123,23 +123,23 @@ public class Fraction implements Comparable<Fraction> {
     }
     
     private static boolean canBeInt( BigInteger val ) {
-    	return (val.compareTo(bigMinInt) >= 0) &&
-     		   (val.compareTo(bigMaxInt) <= 0);
+    	return (val.compareTo(bigMinInt) > 0) &&
+     		   (val.compareTo(bigMaxInt) < 0);
     }
     
     private static boolean canBeLong( BigInteger val ) {
-    	return (val.compareTo(bigMinLong) >= 0) &&
-     		   (val.compareTo(bigMaxLong) <= 0);
+    	return (val.compareTo(bigMinLong) > 0) &&
+     		   (val.compareTo(bigMaxLong) < 0);
     }
     
     private static boolean canBeFloat( BigDecimal val ) {
-    	return ( val.compareTo(bigMinFloat) >= 0) &&
-      		   ( val.compareTo(bigMaxFloat) <= 0);
+    	return ( val.compareTo(bigMinFloat) > 0) &&
+      		   ( val.compareTo(bigMaxFloat) < 0);
     }
     
     private static boolean canBeDouble( BigDecimal val ) {
-    	return ( val.compareTo(bigMinDouble) >= 0) &&
-      		   ( val.compareTo(bigMaxDouble) <= 0);
+    	return ( val.compareTo(bigMinDouble) > 0) &&
+      		   ( val.compareTo(bigMaxDouble) < 0);
     }
     
     /**
@@ -196,7 +196,7 @@ public class Fraction implements Comparable<Fraction> {
     	BigDecimal ratio = bigDecimalValue( mc );
     	
     	if (! canBeDouble(ratio)) {
-    		throw new ArithmeticException( "Fraction's value lies outside the range supported by 'double'" );
+    		throw new ArithmeticException( "Fr	action's value lies outside the range supported by 'double'" );
     	}
     	
     	return ratio.doubleValue();
