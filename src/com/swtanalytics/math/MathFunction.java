@@ -393,20 +393,19 @@ public class MathFunction {
 		MathFunction mf = (MathFunction) o;
 		
 		if (termsByExponent == null) {
-			if (mf.termsByExponent != null)
-				return false;
-		} else if (!termsByExponent.equals(mf.termsByExponent))
-			return false;
+			if (mf.termsByExponent != null) return false;
+			else return true;
+		}
 		
-		return true;
+		return termsByExponent.equals(mf.termsByExponent);
 	}
 	
 	@Override
 	public int hashCode() {
 		final int prime = 31;
-		int result = 1;
-		result = prime * result
-				+ ((termsByExponent == null) ? 0 : termsByExponent.hashCode());
+
+		int result = prime;
+		result += ((termsByExponent == null) ? 0 : termsByExponent.hashCode());
 		return result;
 	}
 }
