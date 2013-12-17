@@ -90,17 +90,17 @@ public class Fraction implements Comparable<Fraction> {
     	return formatString( false, false );
     }
 
-    public String formatString(boolean stripsign_valIfZeroOrGreater, boolean spaceAfterCoefficientsign_val) {
+    public String formatString(boolean stripSignIfZeroOrGreater, boolean spaceAfterCoefficientSign) {
     	StringBuilder result = new StringBuilder();
     	
     	if (this.sign_val == -1) {
     		result.append('-');
     	}
-    	else if (! stripsign_valIfZeroOrGreater) {
+    	else if (! stripSignIfZeroOrGreater) {
     		result.append('+');
     	}
     	
-    	if (spaceAfterCoefficientsign_val && (result.length() > 0)) {
+    	if (spaceAfterCoefficientSign && (result.length() > 0)) {
     		result.append(' ');
     	}
 
@@ -117,7 +117,7 @@ public class Fraction implements Comparable<Fraction> {
     public boolean isWhole() {
     	return this.isWholeFlag;
     }
-    
+
     public BigInteger wholePart() {
         return numerator.divide( denominator );
     }
@@ -226,7 +226,7 @@ public class Fraction implements Comparable<Fraction> {
     	// If we got here, then both fractions are negative or both are positive.  We can multiply 
     	// both 'this' and 'f' by (this.denominator * f.denominator), for the following reasons:
     	// - Because this class ensures that denominators are positive, that multiplication won't
-    	//   affect the sign_val of either fraction.
+    	//   affect the sign of either fraction.
     	// - Because we're multiplying both fractions by the same value, the new fractions will have
     	//   the same relationship (less-than or greater-than) as the fractions on which they're 
     	//   based.
@@ -373,26 +373,71 @@ public class Fraction implements Comparable<Fraction> {
     	return BigDecimal.valueOf(p);
     }
 
+    /**
+     * @param o The object against which this is compared.  Valid types for @c o are @c Fraction,
+     * @c Integer, @c Long, and @c BigInteger.  For the types other than @c Fraction, the provided  
+     * scalar value is taken to be the value of a whole number against which this Fraction is
+     * compared.  
+     */
     @Override
     public boolean equals(Object o) {
     	if (this == o) {
     		return true;
     	}
-    	
-    	if (! ( o instanceof Fraction)) {
-    		return false;
+    	else if (o instanceof Fraction) {
+        	// Try the cheap comparisons first...
+        	Fraction f = (Fraction) o;
+        	if (this.sign_val != f.sign_val) {
+        		return false;
+        	}
+        	    	
+        	// Every mathematically distinct fraction maps to a unique (numerator, denominator) pair,
+        	// thanks to this class's constructors...
+        	if (this.isWholeFlag && f.isWholeFlag) {
+        		return this.numerator.equals( f.numerator  );
+        	}
+        	else if (this.isWholeFlag ^ f.isWholeFlag) {
+        		return false;
+        	}
+        	else {
+        		return this.numerator  .equals(f.numerator  ) && 
+          			   this.denominator.equals(f.denominator);
+        	}
+    	}
+    	else if (o instanceof Integer) {
+    		if (! this.isWholeFlag) {
+    			return false;
+    		}
+    		
+    		if ((numerator.compareTo(bigMinInt) == -1) || (numerator.compareTo(bigMaxInt) == 1)) {
+    			return false;
+    		}
+    		
+    		Integer i = (Integer) o;
+    	   	return numerator.intValue() == i.intValue();
+    	}
+    	else if (o instanceof Long) {
+    		if (! this.isWholeFlag) {
+    			return false;
+    		}
+    		
+    		if ((numerator.compareTo(bigMinLong) == -1) || (numerator.compareTo(bigMaxLong) == 1)) {
+    			return false;
+    		}
+    		
+    		Long l = (Long) o;
+    	   	return numerator.longValue() == l.longValue();
+    	}    	
+    	else if (o instanceof BigInteger) {
+    		if (! this.isWholeFlag) {
+    			return false;
+    		}
+    		
+    		BigInteger bi = (BigInteger) o;
+    	   	return numerator.equals( bi );
     	}
     	
-    	// Try the cheap comparisons before the expensive ones...
-    	Fraction f = (Fraction) o;
-    	if (this.sign_val != f.sign_val) {
-    		return false;
-    	}
-    	    	
-    	// Every mathematically distinct fraction maps to a unique (numerator, denominator) pair,
-    	// thanks to this class's constructors...
-    	return this.numerator  .equals(f.numerator  ) && 
-    		   this.denominator.equals(f.denominator);
+    	return false;
     }
 
     @Override
