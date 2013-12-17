@@ -34,7 +34,7 @@ public class Term implements Comparable<Term> {
     }
 
     protected String formatString(boolean isFirstTerm) {
-        if (this.coefficient.sign == 0) {
+        if (this.coefficient.sign() == 0) {
             return "";
         }
 
@@ -46,7 +46,7 @@ public class Term implements Comparable<Term> {
 
     private String formatVariablePart() {
         String variablePart;
-        if (this.exponent.sign == 0) {
+        if (this.exponent.sign() == 0) {
             variablePart = "";
         } else if (this.exponent.equals( new Fraction(1,1) )) {
             variablePart = "x";
