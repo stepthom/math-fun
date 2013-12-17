@@ -136,4 +136,24 @@ public class TermTest {
         Assert.assertEquals(1, result.exponent.numerator.intValue());
         Assert.assertEquals(1, result.exponent.denominator.intValue());
     }
+    
+    @Test
+    public void multiplyTerms() {
+    	Fraction coeff;
+    	Fraction expo;
+    	
+    	coeff = new Fraction( 2, 3 );
+    	expo  = new Fraction( 5, 7 );
+    	Term t1 = new Term( coeff, expo );
+    	
+    	coeff = new Fraction( 11, 13 );
+    	expo  = new Fraction( 17, 19 );
+    	Term t2 = new Term( coeff, expo );
+    	
+    	coeff = new Fraction( 2*11, 3*13 );
+    	expo  = t1.exponent.add( t2.exponent );
+    	Term t3 = new Term( coeff, expo );
+    	
+        Assert.assertEquals( t3, t1.multiply(t2) );
+    }
 }

@@ -18,6 +18,60 @@ public class MathFunction {
     public MathFunction() {
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof MathFunction)) return false;
+
+        MathFunction otherFunc = (MathFunction) o;
+
+        Set<Fraction> thisExponents  = this.termsByExponent.keySet();
+        Set<Fraction> otherExponents = otherFunc.termsByExponent.keySet();
+        
+        if (! thisExponents.equals(otherExponents)) {
+        	return false;
+        }
+
+        // Note: The following loop would discover if there's an entry in this.termsByExponent 
+        // that's absent from otherFunc.  So it might be possible use speed up the set equality test
+        // above with an asymmetric subset check.
+        
+    	for ( Map.Entry<Fraction, Term> thisEntry : this.termsByExponent.entrySet() ) {
+    		Fraction expo = thisEntry.getKey();
+    		Term thisTerm = thisEntry.getValue();
+    		Term otherTerm = otherFunc.termsByExponent.get( expo );
+    		
+    		if (! thisTerm.equals(otherTerm)) {
+    			return false;
+    		}
+    	}
+        
+        return true;
+    }
+    
+    public MathFunction multiply( MathFunction otherFunc ) {
+    	MathFunction prodFunc = new MathFunction();
+
+		System.out.println( "this      : " + this);
+		System.out.println( "otherFunc : " + otherFunc);
+
+    	for ( Term thisTerm : this.termsByExponent.values() ) {
+    		System.out.println( "thisTerm : " + thisTerm );
+    		
+        	for ( Term otherFuncTerm : otherFunc.termsByExponent.values() ) {
+        		System.out.println( "   otherFuncTerm : " + otherFuncTerm );
+        		
+        		Term prodTerm = thisTerm.multiply( otherFuncTerm );
+        		System.out.println( "   prodTerm : " + prodTerm );
+        		
+        		prodFunc.addTerm( prodTerm );
+           		System.out.println( "   prodFunc : " + prodFunc );
+        	}
+    	}
+    	
+    	return prodFunc;
+    }
+
     public void addTerm(Term t) {
         Term newTerm = termsByExponent.containsKey(t.exponent)
                 ? termsByExponent.get(t.exponent).add(t)
