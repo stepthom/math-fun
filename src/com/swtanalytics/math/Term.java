@@ -28,6 +28,12 @@ public class Term implements Comparable<Term> {
         this.coefficient = new Fraction(c);
         this.exponent = new Fraction(e);
     }
+    
+    public Term multiply( Term t ) {
+    	Fraction coeff = this.coefficient.multiply( t.coefficient );
+    	Fraction exp = this.exponent.add( t.exponent );
+    	return new Term( coeff, exp );
+    }
 
     public String prettyPrint(boolean isFirstTerm) {
         return this.formatString(isFirstTerm);
