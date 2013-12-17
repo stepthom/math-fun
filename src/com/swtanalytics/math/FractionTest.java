@@ -337,6 +337,23 @@ public class FractionTest {
     	Assert.assertEquals( new Fraction("1/2"),  new Fraction( 1, 2));
     	Assert.assertEquals( new Fraction("+1/2"), new Fraction( 1, 2));
     	Assert.assertEquals( new Fraction("~2/3"), new Fraction(-2, 3));
+    	
+    	Fraction f;
+    	
+    	f= new Fraction( 1 );
+    	Assert.assertEquals( f, new Fraction(f.toString()));
+    	
+    	f= new Fraction( 1, 2 );
+    	Assert.assertEquals( f, new Fraction(f.toString()));
+    	
+    	f= new Fraction( -1 );
+    	Assert.assertEquals( f, new Fraction(f.toString()));    	
+    	
+    	f= new Fraction( -1, 2 );
+    	Assert.assertEquals( f, new Fraction(f.toString()));    	
+    	
+    	f= new Fraction( 0 );
+    	Assert.assertEquals( f, new Fraction(f.toString()));    	
     }
     
     @Test(expected= java.lang.NumberFormatException.class)
