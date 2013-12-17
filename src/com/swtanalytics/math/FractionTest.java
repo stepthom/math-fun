@@ -326,4 +326,73 @@ public class FractionTest {
     	Assert.assertNotEquals( whole, null );
     	Assert.assertNotEquals( whole, new String("Hello, World!") );
     }
+    
+    @Test
+    public void testStringConstructor() {
+    	Assert.assertEquals( new Fraction("1"),    new Fraction( 1   ));
+    	Assert.assertEquals( new Fraction("+1"),   new Fraction( 1   ));
+    	Assert.assertEquals( new Fraction("-1"),   new Fraction(-1   ));
+    	Assert.assertEquals( new Fraction("~1"),   new Fraction(-1   ));
+    	Assert.assertEquals( new Fraction("0"),    new Fraction( 0   ));
+    	Assert.assertEquals( new Fraction("1/2"),  new Fraction( 1, 2));
+    	Assert.assertEquals( new Fraction("+1/2"), new Fraction( 1, 2));
+    	Assert.assertEquals( new Fraction("~2/3"), new Fraction(-2, 3));
+    	
+    	Fraction f;
+    	
+    	f= new Fraction( 1 );
+    	Assert.assertEquals( f, new Fraction(f.toString()));
+    	
+    	f= new Fraction( 1, 2 );
+    	Assert.assertEquals( f, new Fraction(f.toString()));
+    	
+    	f= new Fraction( -1 );
+    	Assert.assertEquals( f, new Fraction(f.toString()));    	
+    	
+    	f= new Fraction( -1, 2 );
+    	Assert.assertEquals( f, new Fraction(f.toString()));    	
+    	
+    	f= new Fraction( 0 );
+    	Assert.assertEquals( f, new Fraction(f.toString()));    	
+    }
+    
+    @Test(expected= java.lang.NumberFormatException.class)
+    public void testInvalidStringConstructor1() {
+    	new Fraction( "" );
+    }
+    
+    @Test(expected= java.lang.NumberFormatException.class)
+    public void testInvalidStringConstructor2() {
+    	new Fraction( "X" );
+    }
+    
+    @Test(expected= java.lang.NumberFormatException.class)
+    public void testInvalidStringConstructor3() {
+    	new Fraction( "/0" );
+    }
+    
+    @Test(expected= java.lang.NumberFormatException.class)
+    public void testInvalidStringConstructor4() {
+    	new Fraction( "/2" );
+    }
+    
+    @Test(expected= java.lang.NumberFormatException.class)
+    public void testInvalidStringConstructor5() {
+    	new Fraction( "/-2" );
+    }
+    
+    @Test(expected= java.lang.NumberFormatException.class)
+    public void testInvalidStringConstructor6() {
+    	new Fraction( "-1/-2" );
+    }
+    
+    @Test(expected= java.lang.NumberFormatException.class)
+    public void testInvalidStringConstructor7() {
+    	new Fraction( "1/0" );
+    }
+    
+    @Test(expected= java.lang.NumberFormatException.class)
+    public void testInvalidStringConstructor8() {
+    	new Fraction( " 1/2 " );
+    }
 }

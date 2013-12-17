@@ -4,9 +4,17 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.MathContext;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 public class Fraction implements Comparable<Fraction> {
     protected final BigInteger numerator;
     protected final BigInteger denominator;
+
+    // We allow '~' as an alternative for '-', because in some contexts '-' might be confused with 
+    // a command-line switch.
+    private static Pattern parsePattern = 
+    		Pattern.compile("^(?<SIGN>[+~-])?(?<NUMERATOR>\\d+)((?:/)(?<DENOMINATOR>[1-9][0-9]*))?$");
     
     // -1, 0, or 1, depending on whether the Fraction is less than, equal to, or greater than zero,
     // respectively.
@@ -29,6 +37,69 @@ public class Fraction implements Comparable<Fraction> {
 
     private static final BigDecimal bigMinDouble = BigDecimal.valueOf( Double.MIN_VALUE );
     private static final BigDecimal bigMaxDouble = BigDecimal.valueOf( Double.MAX_VALUE );
+
+    public Fraction(String s) throws NumberFormatException {    	
+    	Matcher m = parsePattern.matcher( s );
+    	
+    	System.out.println( "Whole string = '" + s + "'");
+    	if (! m.matches()) {
+    		System.out.println( "String cannot be parsed as a Fraction object: '" + s + "'" );
+    		throw new NumberFormatException("FOO"); 
+    	}
+    	
+    	String signStr = m.group("SIGN");
+    	String numeratorStr = m.group("NUMERATOR");
+    	String denominatorStr = m.group("DENOMINATOR");
+    	
+    	BigInteger n = new BigInteger( numeratorStr );
+    	
+    	if (n.equals(bigZero)) {
+    		this.sign_val = 0;
+    		this.numerator = bigZero;
+    		this.denominator = bigOne;
+    		this.isWholeFlag = true;
+    	}
+    	else {
+    		if ((signStr != null)  &&  (signStr.equals("~") || signStr.equals("-"))) {
+        		this.sign_val = -1;
+    		}
+    		else {
+        		this.sign_val = 1;
+    		}
+    		
+        	BigInteger d;
+        	if (denominatorStr == null) {
+        		if (this.sign_val == -1) {
+        			this.numerator = n.negate();
+        		}
+        		else {
+            		this.numerator = n;
+        		}
+        		
+        		this.denominator = bigOne;
+        		this.isWholeFlag = true;
+        	}
+        	else {
+        		d = new BigInteger( denominatorStr );    	
+
+    	        BigInteger g = n.gcd( d );
+    	        BigInteger tempNumerator = n.divide( g );
+    	        BigInteger tempDenominator = d.divide( g );
+
+        		this.denominator = tempDenominator;
+
+        		if (this.sign_val == -1) {
+            		this.numerator = tempNumerator.negate();   	        
+        		}
+        		else {
+            		this.numerator = tempNumerator;   	        
+        		}
+    	        
+        		this.isWholeFlag = tempDenominator.equals( bigOne );
+        	}
+    	}
+    }
+    
     
     public Fraction(BigInteger n, BigInteger d) {
     	int nsign_val = n.compareTo( bigZero );
