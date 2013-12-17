@@ -4,6 +4,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
+import java.math.MathContext;
 import java.util.Arrays;
 import java.util.Collection;
 
@@ -61,7 +62,7 @@ public class EvaluateTest {
             function.addTerm(term);
         }
         System.out.println(function.toString());
-        double result = function.evaluate(x);
+        double result = function.evaluate(x, MathContext.DECIMAL128);
         System.out.format("f(%f) = %f%n", x, result);
         assertEquals(expected, result, EPSILON);
     }

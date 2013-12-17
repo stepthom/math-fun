@@ -4,6 +4,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
+import java.math.MathContext;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -57,7 +58,7 @@ public class FindMinMaxTest {
         }
         System.out.println(function.toString());
 
-        assertEquals(expectedMin, function.findMinimum(domainMin, domainMax), EPSILON);
-        assertEquals(expectedMax, function.findMaximum(domainMin, domainMax), EPSILON);
+        assertEquals(expectedMin, function.findMinimum(domainMin, domainMax, MathContext.DECIMAL128), EPSILON);
+        assertEquals(expectedMax, function.findMaximum(domainMin, domainMax, MathContext.DECIMAL128), EPSILON);
     }
 }

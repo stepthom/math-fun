@@ -131,9 +131,9 @@ public class TermTest {
         Term result = term1.add(term2);
 
         // Assert
-        Assert.assertEquals(3, result.coefficient.numerator);
-        Assert.assertEquals(1, result.coefficient.denominator);
-        Assert.assertEquals(1, result.exponent.numerator);
-        Assert.assertEquals(1, result.exponent.denominator);
+        Assert.assertEquals(3, result.coefficient.numerator.intValue());
+        Assert.assertEquals(1, result.coefficient.denominator.intValue());
+        Assert.assertEquals(1, result.exponent.numerator.intValue());
+        Assert.assertEquals(1, result.exponent.denominator.intValue());
     }
 }

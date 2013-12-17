@@ -26,8 +26,8 @@ public class RandomFractionFactoryTest {
         Fraction result = fractionGenerator.createCoefficient(true, .5);
 
         // Assert
-        Assert.assertEquals(10, result.numerator);
-        Assert.assertEquals(1, result.denominator);
+        Assert.assertEquals(10, result.numerator.intValue());
+        Assert.assertEquals(1, result.denominator.intValue());
 
         Assert.assertEquals(-50, integerGenerator.lastMinInclusiveArgument);
         Assert.assertEquals(49, integerGenerator.lastMaxInclusiveArgument);
@@ -44,8 +44,8 @@ public class RandomFractionFactoryTest {
         Fraction result = fractionGenerator.createCoefficient(false, .5);
 
         // Assert
-        Assert.assertEquals(1, result.numerator);
-        Assert.assertEquals(2, result.denominator);
+        Assert.assertEquals(1, result.numerator.intValue());
+        Assert.assertEquals(2, result.denominator.intValue());
     }
 
     @Test
@@ -57,8 +57,8 @@ public class RandomFractionFactoryTest {
         Fraction result = fractionGenerator.createExponent(41);
 
         // Assert
-        Assert.assertEquals(37, result.numerator);
-        Assert.assertEquals(1, result.denominator);
+        Assert.assertEquals(37, result.numerator.intValue());
+        Assert.assertEquals(1, result.denominator.intValue());
 
         Assert.assertEquals(0, integerGenerator.lastMinInclusiveArgument);
         Assert.assertEquals(41, integerGenerator.lastMaxInclusiveArgument);

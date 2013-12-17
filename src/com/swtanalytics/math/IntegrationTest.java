@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,10 +26,10 @@ public class IntegrationTest {
         Fraction integralCoefficient = terms.get(0).coefficient;
 		Fraction integralExponent = terms.get(0).exponent;
 		
-		assertTrue(integralCoefficient.numerator == 4);
-		assertTrue(integralCoefficient.denominator == 3);
-		assertTrue(integralExponent.numerator == 3);
-		assertTrue(integralExponent.denominator == 1);
+		assertTrue(integralCoefficient.numerator.intValue() == 4);
+		assertTrue(integralCoefficient.denominator.intValue() == 3);
+		assertTrue(integralExponent.numerator.intValue() == 3);
+		assertTrue(integralExponent.denominator.intValue() == 1);
 	}
 
 	@Test
@@ -47,10 +48,10 @@ public class IntegrationTest {
 		Fraction integralCoefficient = terms.get(0).coefficient;
 		Fraction integralExponent = terms.get(0).exponent;
 		
-		assertTrue(integralCoefficient.numerator == 2);
-		assertTrue(integralCoefficient.denominator == 1);
-		assertTrue(integralExponent.numerator == 1);
-		assertTrue(integralExponent.denominator == 1);
+		assertTrue(integralCoefficient.numerator.intValue() == 2);
+		assertTrue(integralCoefficient.denominator.intValue() == 1);
+		assertTrue(integralExponent.numerator.intValue() == 1);
+		assertTrue(integralExponent.denominator.intValue() == 1);
 	}
 
 	@Test
@@ -69,10 +70,10 @@ public class IntegrationTest {
 		Fraction integralCoefficient = terms.get(0).coefficient;
 		Fraction integralExponent = terms.get(0).exponent;
 		
-		assertTrue(integralCoefficient.numerator == 1);
-		assertTrue(integralCoefficient.denominator == 8);
-		assertTrue(integralExponent.numerator == 4);
-		assertTrue(integralExponent.denominator == 1);
+		assertTrue(integralCoefficient.numerator.intValue() == 1);
+		assertTrue(integralCoefficient.denominator.intValue() == 8);
+		assertTrue(integralExponent.numerator.intValue() == 4);
+		assertTrue(integralExponent.denominator.intValue() == 1);
 	}
 
 	@Test
@@ -90,10 +91,10 @@ public class IntegrationTest {
         List<Term> terms = new ArrayList<Term>(integral.getTerms());
 		Fraction integralCoefficient = terms.get(0).coefficient;
 		Fraction integralExponent = terms.get(0).exponent;
-		
-		assertTrue(integralCoefficient.numerator == 3);
-		assertTrue(integralCoefficient.denominator == 2);
-		assertTrue(integralExponent.numerator == 4);
-		assertTrue(integralExponent.denominator == 3);
+				
+		assertTrue(integralCoefficient.numerator.intValue() == 3);
+		assertTrue(integralCoefficient.denominator.intValue() == 2);
+		assertTrue(integralExponent.numerator.intValue() == 4);
+		assertTrue(integralExponent.denominator.intValue() == 3);
 	}
 }

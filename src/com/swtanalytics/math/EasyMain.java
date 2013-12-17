@@ -1,6 +1,7 @@
 package com.swtanalytics.math;
 
 import java.io.IOException;
+import java.math.MathContext;
 
 import org.kohsuke.args4j.Option;
 import org.kohsuke.args4j.CmdLineParser;
@@ -74,7 +75,7 @@ public class EasyMain {
         return functionString.toString();
     }
 
-    public void printFunction(MathFunction mf, int i) {
+    public void printFunction(MathFunction mf, int i, MathContext mc) {
     	System.out.println("  <function>");
 
     	printFunction(mf, i, FunctionType.NORMAL);
@@ -93,7 +94,7 @@ public class EasyMain {
         
         printMinMax(mf);
         
-        printIntercepts(mf);
+        printIntercepts(mf, mc);
 
     	System.out.println("  </function>");
     }
@@ -106,9 +107,11 @@ public class EasyMain {
     }
 
     private void printMinMax(MathFunction function) {
+    	MathContext mc = MathContext.DECIMAL128;
+    	
         try {
-            double minX = function.findMinimum(domainMin, domainMax);
-            double minY = function.evaluate(minX);
+            double minX = function.findMinimum(domainMin, domainMax, mc);
+            double minY = function.evaluate(minX, mc);
             if (!Double.isNaN(minX) && !Double.isNaN(minY)) {
                 System.out.format("    <min>(%f, %f)</min>%n", minX, minY);
             }
@@ -116,8 +119,8 @@ public class EasyMain {
         }
 
         try {
-            double maxX = function.findMaximum(domainMin, domainMax);
-            double maxY = function.evaluate(maxX);
+            double maxX = function.findMaximum(domainMin, domainMax, mc);
+            double maxY = function.evaluate(maxX, mc);
             if (!Double.isNaN(maxX) && !Double.isNaN(maxY)) {
                 System.out.format("    <max>(%f, %f)</max>%n", maxX, maxY);
             }
@@ -125,11 +128,11 @@ public class EasyMain {
         }
     }
 
-    private void printIntercepts(MathFunction function) {
-        System.out.format("    <y-intercept>%f</y-intercept>%n", function.evaluate(0));
+    private void printIntercepts(MathFunction function, MathContext mc) {
+        System.out.format("    <y-intercept>%f</y-intercept>%n", function.evaluate(0, mc));
 
         try {
-            for (double solution : function.solve())
+            for (double solution : function.solve(mc))
             {
                 System.out.format("    <x-intercept>%f</x-intercept>%n", solution);
             }
@@ -174,10 +177,12 @@ public class EasyMain {
     // The main logic loop
     public void run() {
     	System.out.println("<functions>");
-
+    	
+    	MathContext mc = MathContext.DECIMAL128;
+    	
     	for (int i=0; i<this.numMathFunctions;++i){
             MathFunction mf = functionFactory.create(!this.isFractions, this.forceLinearFunctions);
-            printFunction(mf, i);
+            printFunction(mf, i, mc);
         }
 
     	System.out.println("</functions>");

@@ -1,5 +1,7 @@
 package com.swtanalytics.math;
 
+import java.math.BigInteger;
+import java.math.MathContext;
 import java.util.*;
 
 public class MathFunction {
@@ -60,7 +62,7 @@ public class MathFunction {
             for (Term t : termsByExponent.values()) {
                 // XXX This will make uncollapsed x^0 and x^1 terms in the
                 //     Style of the original class.
-                if (t.exponent.numerator != 0) {
+                if (t.exponent.sign != 0) {
                     Term dt = new Term(t.coefficient.multiply(t.exponent), t.exponent.subtract(new Fraction(1, 1)));
                     cachedDerivative.addTerm(dt);
                 }
@@ -75,7 +77,10 @@ public class MathFunction {
             cachedIntegral = new MathFunction();
 
             for (Term t : termsByExponent.values()) {
-                Fraction exp = new Fraction(t.exponent.numerator + t.exponent.denominator, t.exponent.denominator);
+                Fraction exp = new Fraction(
+                		t.exponent.numerator.add(t.exponent.denominator), 
+                		t.exponent.denominator);
+                
                 Fraction coef = t.coefficient.multiply(new Fraction(exp.denominator, exp.numerator));
 
                 Term integralTerm = new Term(coef, exp);
@@ -86,7 +91,7 @@ public class MathFunction {
         return cachedIntegral;
     }
 
-    public double evaluate(double value) {
+    public double evaluate(double value, MathContext mc) {
         if (termsByExponent.isEmpty()) {
             return 0;
         }
@@ -105,7 +110,7 @@ public class MathFunction {
             if (exponentSign < 0) {
                 return 0;
             } else if (exponentSign == 0) {
-                return dominantTerm.coefficient.doubleValue();
+                return dominantTerm.coefficient.bigDecimalValue(mc).doubleValue();
             }
 
             int coefficientSign = dominantTerm.coefficient.compareTo(zero);
@@ -116,7 +121,7 @@ public class MathFunction {
             } else {
                 // Limit at negative infinity
                 assert !hasFractionalExponent(); // Checked this case above
-                if ((dominantTerm.exponent.wholePart() % 2 != 0)) {
+                if ((dominantTerm.exponent.wholePart().mod( BigInteger.valueOf(2) ) != BigInteger.valueOf(0))) {
                     coefficientSign = -coefficientSign;
                 }
                 return coefficientSign < 0 ? Double.NEGATIVE_INFINITY : Double.POSITIVE_INFINITY;
@@ -126,7 +131,7 @@ public class MathFunction {
         double returnValue = 0d;
 
         for (Term term : termsByExponent.values()) {
-            returnValue += term.evaluate(value);
+            returnValue += term.evaluate(value, mc);
         }
 
         return returnValue;
@@ -178,7 +183,7 @@ public class MathFunction {
         return zero;
     }
 
-    public List<Double> solve() {
+    public List<Double> solve(MathContext mc) {
         // We *could* special-case f(x) = 0, which has infinite solutions, but I'm not sure what we would return in that
         // case, so let's treat it as any other constant function in the check below
 
@@ -189,8 +194,8 @@ public class MathFunction {
 
         if (isLinearFunction()) {
             // Closed-form solution to 0 = ax+b : x = -b/a
-            double a = getCoefficient(one).doubleValue();
-            double b = getCoefficient(zero).doubleValue();
+            double a = getCoefficient(one).bigDecimalValue(mc).doubleValue();
+            double b = getCoefficient(zero).bigDecimalValue(mc).doubleValue();
             return Collections.singletonList(-b / a);
         }
 
@@ -204,7 +209,7 @@ public class MathFunction {
                 simplified.addTerm(new Term(term.coefficient, term.exponent.subtract(leastDegree)));
             }
 
-            List<Double> solutions = simplified.solve();
+            List<Double> solutions = simplified.solve( mc );
             if (!solutions.contains(0.0)) {
                 solutions = new ArrayList<Double>(solutions); // solutions could be read-only
                 // TODO: Find & insert instead of sort
@@ -224,18 +229,18 @@ public class MathFunction {
         double domainBegin;
         double rangeBegin;
         double domainEnd = Double.NEGATIVE_INFINITY;
-        double rangeEnd = evaluate(domainEnd);
+        double rangeEnd = evaluate(domainEnd, mc);
 
-        for (double newDomainEnd : getCriticalPoints()) {
+        for (double newDomainEnd : getCriticalPoints(mc)) {
             domainBegin = domainEnd;
             rangeBegin = rangeEnd;
             domainEnd = newDomainEnd;
-            rangeEnd = evaluate(domainEnd);
+            rangeEnd = evaluate(domainEnd, mc);
 
             if (rangeBegin == 0) {
                 solutions.add(domainBegin);
             }
-            double solution = interiorSolution(domainBegin, domainEnd);
+            double solution = interiorSolution(domainBegin, domainEnd, mc);
             if (!Double.isNaN(solution)) {
                 solutions.add(solution);
             }
@@ -244,12 +249,12 @@ public class MathFunction {
         domainBegin = domainEnd;
         rangeBegin = rangeEnd;
         domainEnd = Double.POSITIVE_INFINITY;
-        rangeEnd = evaluate(domainEnd);
+        rangeEnd = evaluate(domainEnd, mc);
 
         if (rangeBegin == 0) {
             solutions.add(domainBegin);
         }
-        double solution = interiorSolution(domainBegin, domainEnd);
+        double solution = interiorSolution(domainBegin, domainEnd, mc);
         if (!Double.isNaN(solution)) {
             solutions.add(solution);
         }
@@ -260,9 +265,9 @@ public class MathFunction {
         return solutions;
     }
 
-    private double interiorSolution(double domainBegin, double domainEnd) {
-        int rangeBeginSign = Double.compare(evaluate(domainBegin), 0);
-        int rangeEndSign = Double.compare(evaluate(domainEnd), 0);
+    private double interiorSolution(double domainBegin, double domainEnd, MathContext mc) {
+        int rangeBeginSign = Double.compare(evaluate(domainBegin, mc), 0);
+        int rangeEndSign = Double.compare(evaluate(domainEnd, mc), 0);
         if (rangeBeginSign == 0 || rangeEndSign == 0 || rangeBeginSign == rangeEndSign) {
             return Double.NaN;
         }
@@ -276,7 +281,7 @@ public class MathFunction {
                 return x;
             }
 
-            double y = evaluate(x);
+            double y = evaluate(x, mc);
             if (y == 0) {
                 return x;
             }
@@ -295,7 +300,7 @@ public class MathFunction {
                 rangeEndSign = ySign;
             }
 
-            double newX = x - y / derivative.evaluate(x);
+            double newX = x - y / derivative.evaluate(x, mc);
             if (Math.abs(x - newX) < NEWTON_X_EPSILON) {
                 return x;
             }
@@ -332,7 +337,7 @@ public class MathFunction {
         return x;
     }
 
-    private List<Double> getCriticalPoints() {
+    private List<Double> getCriticalPoints( MathContext mc ) {
         if (isLinearFunction()) {
             return Collections.emptyList();
         }
@@ -343,41 +348,41 @@ public class MathFunction {
             throw new UnsupportedOperationException(); // an exercise for the reader ;-)
         }
 
-        return differentiate().solve();
+        return differentiate().solve( mc );
     }
 
-    public double findMaximum(double domainMin, double domainMax) {
+    public double findMaximum(double domainMin, double domainMax, MathContext mc) {
         double xMax = domainMin;
-        double yMax = evaluate(xMax);
-        for (double critical : getCriticalPoints()) {
+        double yMax = evaluate(xMax, mc);
+        for (double critical : getCriticalPoints( mc )) {
             if (critical <= domainMin) continue;
             if (domainMax <= critical) break;
-            double y = evaluate(critical);
+            double y = evaluate(critical, mc);
             if (yMax < y) {
                 xMax = critical;
                 yMax = y;
             }
         }
-        double y = evaluate(domainMax);
+        double y = evaluate(domainMax, mc);
         if (yMax < y) {
             xMax = domainMax;
         }
         return xMax;
     }
 
-    public double findMinimum(double domainMin, double domainMax) {
+    public double findMinimum(double domainMin, double domainMax, MathContext mc) {
         double xMin = domainMin;
-        double yMin = evaluate(xMin);
-        for (double critical : getCriticalPoints()) {
+        double yMin = evaluate(xMin, mc);
+        for (double critical : getCriticalPoints(mc)) {
             if (critical <= domainMin) continue;
             if (domainMax <= critical) break;
-            double y = evaluate(critical);
+            double y = evaluate(critical, mc);
             if (y < yMin) {
                 xMin = critical;
                 yMin = y;
             }
         }
-        double y = evaluate(domainMax);
+        double y = evaluate(domainMax, mc);
         if (y < yMin) {
             xMin = domainMax;
         }

@@ -1,5 +1,8 @@
 package com.swtanalytics.math;
 
+import java.math.BigInteger;
+import java.math.MathContext;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -72,7 +75,7 @@ public class FractionTest {
         String result = fraction.formatString(true, false);
 
         //Assert
-        Assert.assertEquals("0/17", result);
+        Assert.assertEquals("0", result);
     }
 
     @Test
@@ -83,13 +86,46 @@ public class FractionTest {
         Fraction smallNegativeMinusBigNegative = new Fraction(40, 7);
 
         String BAD_SUBTRACT_MSG = "Fraction subtraction computed incorrectly.";
+        
+        // The choice of 128-bit precision is somewhat arbitrary, but it's used to demonstrate that we can get more precision
+        // than Java's built-in 'double' type.
+        MathContext mc = MathContext.DECIMAL128; 
+        
+        //Assert.assertEquals(BAD_SUBTRACT_MSG, zero.subtract(oneThird).doubleValue(), oneThird.doubleValue() * -1.0, 0.0);
+        Assert.assertEquals(BAD_SUBTRACT_MSG, 
+        		            zero.subtract(oneThird).bigDecimalValue( mc ).doubleValue(), 
+        		            oneThird.bigDecimalValue( mc ).doubleValue() * -1.0, 
+        		            0.0);
+        
+        //Assert.assertEquals(BAD_SUBTRACT_MSG, zero.subtract(smallNegative).doubleValue(), smallNegative.doubleValue() * -1.0, 0.0);
+        Assert.assertEquals(BAD_SUBTRACT_MSG, 
+        					zero.subtract(smallNegative).bigDecimalValue( mc ).doubleValue(), 
+        					smallNegative.bigDecimalValue( mc ).doubleValue() * -1.0, 
+        					0.0);
 
-        Assert.assertEquals(BAD_SUBTRACT_MSG, zero.subtract(oneThird).doubleValue(), oneThird.doubleValue() * -1.0, 0.0);
-        Assert.assertEquals(BAD_SUBTRACT_MSG, zero.subtract(smallNegative).doubleValue(), smallNegative.doubleValue() * -1.0, 0.0);
-        Assert.assertEquals(BAD_SUBTRACT_MSG, oneThird.subtract(zero).doubleValue(), oneThird.doubleValue(), 0.0);
-        Assert.assertEquals(BAD_SUBTRACT_MSG, oneThird.subtract(smallNegative).doubleValue(), oneThirdMinusSmallNegative.doubleValue(), 0.0);
-        Assert.assertEquals(BAD_SUBTRACT_MSG, bigNegative.subtract(oneThird).doubleValue(), bigNegativeMinusOneThird.doubleValue(), 0.0);
-        Assert.assertEquals(BAD_SUBTRACT_MSG, smallNegative.subtract(bigNegative).doubleValue(), smallNegativeMinusBigNegative.doubleValue(), 0.0);
+        //Assert.assertEquals(BAD_SUBTRACT_MSG, oneThird.subtract(zero).doubleValue(), oneThird.doubleValue(), 0.0);
+        Assert.assertEquals(BAD_SUBTRACT_MSG, 
+        				    oneThird.subtract(zero).bigDecimalValue( mc ).doubleValue(), 
+        				    oneThird.bigDecimalValue( mc ).doubleValue(), 
+        				    0.0);
+        
+        //Assert.assertEquals(BAD_SUBTRACT_MSG, oneThird.subtract(smallNegative).doubleValue(), oneThirdMinusSmallNegative.doubleValue(), 0.0);
+        Assert.assertEquals(BAD_SUBTRACT_MSG, 
+        					oneThird.subtract(smallNegative).bigDecimalValue( mc ).doubleValue(), 
+        					oneThirdMinusSmallNegative.bigDecimalValue( mc ).doubleValue(), 
+        					0.0);
+        
+        //Assert.assertEquals(BAD_SUBTRACT_MSG, bigNegative.subtract(oneThird).doubleValue(), bigNegativeMinusOneThird.doubleValue(), 0.0);
+        Assert.assertEquals(BAD_SUBTRACT_MSG, 
+        					bigNegative.subtract(oneThird).bigDecimalValue( mc ).doubleValue(), 
+        					bigNegativeMinusOneThird.bigDecimalValue( mc ).doubleValue(), 
+        					0.0);
+        
+        //Assert.assertEquals(BAD_SUBTRACT_MSG, smallNegative.subtract(bigNegative).doubleValue(), smallNegativeMinusBigNegative.doubleValue(), 0.0);
+        Assert.assertEquals(BAD_SUBTRACT_MSG, 
+        					smallNegative.subtract(bigNegative).bigDecimalValue( mc ).doubleValue(), 
+        					smallNegativeMinusBigNegative.bigDecimalValue( mc ).doubleValue(), 
+        					0.0);
     }
 
     @Test
@@ -101,21 +137,39 @@ public class FractionTest {
 
         String BAD_SIMPLIFY_MSG = "Fraction simplified incorrectly.";
 
-        Assert.assertEquals(BAD_SIMPLIFY_MSG, zero.numerator, 0);
+        Assert.assertEquals(BAD_SIMPLIFY_MSG, zero.numerator, BigInteger.valueOf(0));
 
-        Assert.assertEquals(BAD_SIMPLIFY_MSG, oneThird.numerator, 1);
-        Assert.assertEquals(BAD_SIMPLIFY_MSG, oneThird.denominator, 3);
+        Assert.assertEquals(BAD_SIMPLIFY_MSG, oneThird.numerator, BigInteger.valueOf(1));
+        Assert.assertEquals(BAD_SIMPLIFY_MSG, oneThird.denominator, BigInteger.valueOf(3));
 
-        Assert.assertEquals(BAD_SIMPLIFY_MSG, seven.numerator, 7);
-        Assert.assertEquals(BAD_SIMPLIFY_MSG, seven.denominator, 1);
+        Assert.assertEquals(BAD_SIMPLIFY_MSG, seven.numerator, BigInteger.valueOf(7));
+        Assert.assertEquals(BAD_SIMPLIFY_MSG, seven.denominator, BigInteger.valueOf(1));
 
-        Assert.assertEquals(BAD_SIMPLIFY_MSG, minusfourth.numerator, -1);
-        Assert.assertEquals(BAD_SIMPLIFY_MSG, minusfourth.denominator, 4);
+        Assert.assertEquals(BAD_SIMPLIFY_MSG, minusfourth.numerator, BigInteger.valueOf(-1));
+        Assert.assertEquals(BAD_SIMPLIFY_MSG, minusfourth.denominator, BigInteger.valueOf(4));
 
-        Assert.assertEquals(BAD_SIMPLIFY_MSG, same.numerator, -11);
-        Assert.assertEquals(BAD_SIMPLIFY_MSG, same.denominator, 12);
+        Assert.assertEquals(BAD_SIMPLIFY_MSG, same.numerator, BigInteger.valueOf(-11));
+        Assert.assertEquals(BAD_SIMPLIFY_MSG, same.denominator, BigInteger.valueOf(12));
 
-        Assert.assertEquals(BAD_SIMPLIFY_MSG, minusminus.numerator, 4);
-        Assert.assertEquals(BAD_SIMPLIFY_MSG, minusminus.denominator, 1);
+        Assert.assertEquals(BAD_SIMPLIFY_MSG, minusminus.numerator, BigInteger.valueOf(4));
+        Assert.assertEquals(BAD_SIMPLIFY_MSG, minusminus.denominator, BigInteger.valueOf(1));
+    }
+    
+    @Test 
+    public void testCanHandleBigNumbers() {
+    	// Confirm that Fraction objects can handle values larger than Java primitive int's could
+    	// accommodate.
+    	Fraction maxPosIntFraction = new Fraction( Integer.MAX_VALUE );
+    	Fraction minNegIntFraction = new Fraction( Integer.MIN_VALUE );
+    	
+    	String BAD_CAN_HANDLE_BIG_NUMBERS_MSG = "Encountered unexpected numerical overflow or underflow.";
+    	
+    	Fraction potentialIntOverflow = maxPosIntFraction.multiply( new Fraction(2) );
+    	Assert.assertEquals( BAD_CAN_HANDLE_BIG_NUMBERS_MSG, 
+    						 maxPosIntFraction.compareTo( potentialIntOverflow ), -1 );
+
+    	Fraction potentialIntUnderflow = minNegIntFraction.multiply( new Fraction(2) );
+    	Assert.assertEquals( BAD_CAN_HANDLE_BIG_NUMBERS_MSG,
+    						 minNegIntFraction.compareTo( potentialIntUnderflow ), 1 );
     }
 }
