@@ -92,37 +92,31 @@ public class FractionTest {
         // than Java's built-in 'double' type.
         MathContext mc = MathContext.DECIMAL128; 
         
-        //Assert.assertEquals(BAD_SUBTRACT_MSG, zero.subtract(oneThird).doubleValue(), oneThird.doubleValue() * -1.0, 0.0);
         Assert.assertEquals(BAD_SUBTRACT_MSG, 
         		            zero.subtract(oneThird).bigDecimalValue( mc ).doubleValue(), 
         		            oneThird.bigDecimalValue( mc ).doubleValue() * -1.0, 
         		            0.0);
         
-        //Assert.assertEquals(BAD_SUBTRACT_MSG, zero.subtract(smallNegative).doubleValue(), smallNegative.doubleValue() * -1.0, 0.0);
         Assert.assertEquals(BAD_SUBTRACT_MSG, 
         					zero.subtract(smallNegative).bigDecimalValue( mc ).doubleValue(), 
         					smallNegative.bigDecimalValue( mc ).doubleValue() * -1.0, 
         					0.0);
 
-        //Assert.assertEquals(BAD_SUBTRACT_MSG, oneThird.subtract(zero).doubleValue(), oneThird.doubleValue(), 0.0);
         Assert.assertEquals(BAD_SUBTRACT_MSG, 
         				    oneThird.subtract(zero).bigDecimalValue( mc ).doubleValue(), 
         				    oneThird.bigDecimalValue( mc ).doubleValue(), 
         				    0.0);
         
-        //Assert.assertEquals(BAD_SUBTRACT_MSG, oneThird.subtract(smallNegative).doubleValue(), oneThirdMinusSmallNegative.doubleValue(), 0.0);
         Assert.assertEquals(BAD_SUBTRACT_MSG, 
         					oneThird.subtract(smallNegative).bigDecimalValue( mc ).doubleValue(), 
         					oneThirdMinusSmallNegative.bigDecimalValue( mc ).doubleValue(), 
         					0.0);
         
-        //Assert.assertEquals(BAD_SUBTRACT_MSG, bigNegative.subtract(oneThird).doubleValue(), bigNegativeMinusOneThird.doubleValue(), 0.0);
         Assert.assertEquals(BAD_SUBTRACT_MSG, 
         					bigNegative.subtract(oneThird).bigDecimalValue( mc ).doubleValue(), 
         					bigNegativeMinusOneThird.bigDecimalValue( mc ).doubleValue(), 
         					0.0);
         
-        //Assert.assertEquals(BAD_SUBTRACT_MSG, smallNegative.subtract(bigNegative).doubleValue(), smallNegativeMinusBigNegative.doubleValue(), 0.0);
         Assert.assertEquals(BAD_SUBTRACT_MSG, 
         					smallNegative.subtract(bigNegative).bigDecimalValue( mc ).doubleValue(), 
         					smallNegativeMinusBigNegative.bigDecimalValue( mc ).doubleValue(), 
