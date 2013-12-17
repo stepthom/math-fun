@@ -44,9 +44,39 @@ public class EasyMain {
 
     @Option(name = "--domain-max", usage = "Domain maximum, for min/max calculations (defaults to +infinity)")
     public double domainMax = Double.POSITIVE_INFINITY;
+    
+    @Option(name = "--definite-integral", metaVar = "a,b", usage = "Calculate definite integral between a (lower) and b (upper) bounds")
+    public void parseDefiniteIntegralValues(String arg) {
+    	String[] vals = arg.split(",");
+    	final String diusage = "Option --definite-integral requires 2 decimals in the format '1.0,2.0'";
+    	try {
+	    	if (vals.length != 2) {
+	    		throw new CmdLineException(parser, String.format("%s : invalid number of arguments (%d)", diusage, vals.length));
+	    	}
+	    	try {
+	    		definiteIntegralA = Double.parseDouble(vals[0]);
+	    		definiteIntegralB = Double.parseDouble(vals[1]);
+	    		
+	    	} catch (NumberFormatException nfe) {
+	    		throw new CmdLineException(parser, String.format("%s : invalid decimal format for arguments", diusage));
+	    	}
+    	} catch (CmdLineException e) { CmdLineExceptionHandler(e); }
+    }
+    public double definiteIntegralA = 0;
+    public double definiteIntegralB = 0;
+    
+    private void CmdLineExceptionHandler(CmdLineException e) {
+        System.out.print(e.getMessage());
+        System.out.print("\n");
+        parser.printUsage(System.err);
+        System.exit(1);
+    }
+
+    private CmdLineParser parser = null;
 
     protected void parse_input(String[] args) {
-        CmdLineParser parser = new CmdLineParser(this);
+        //CmdLineParser parser = new CmdLineParser(this);
+    	parser = new CmdLineParser(this);
         try {
             parser.parseArgument(args);
             // validate the input a bit.
@@ -55,12 +85,7 @@ public class EasyMain {
                 throw new CmdLineException(parser, "Option -n requires a positive integer");
             }
 
-        } catch (CmdLineException e) {
-            System.out.print(e.getMessage());
-            System.out.print("\n");
-            parser.printUsage(System.err);
-            System.exit(1);
-        }
+        } catch (CmdLineException e) { CmdLineExceptionHandler(e); }
     }
 
     protected String getFunctionString(MathFunction mf, int i, FunctionType type) {
