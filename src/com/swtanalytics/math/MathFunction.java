@@ -33,7 +33,7 @@ public class MathFunction {
         }
 
         // Note: The following loop would discover if there's an entry in this.termsByExponent 
-        // that's absent from otherFunc.  So it might be possible use speed up the set equality test
+        // that's absent from otherFunc.  So it might be possible to speed up the set equality test
         // above with an asymmetric subset check.
         
     	for ( Map.Entry<Fraction, Term> thisEntry : this.termsByExponent.entrySet() ) {
