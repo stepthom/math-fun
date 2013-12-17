@@ -388,4 +388,29 @@ public class MathFunction {
         }
         return xMin;
     }
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null) return false;
+		if (!(o instanceof MathFunction)) return false;
+
+		MathFunction mf = (MathFunction) o;
+		
+		if (termsByExponent == null) {
+			if (mf.termsByExponent != null) return false;
+			else return true;
+		}
+		
+		return termsByExponent.equals(mf.termsByExponent);
+	}
+	
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+
+		int result = prime;
+		result += ((termsByExponent == null) ? 0 : termsByExponent.hashCode());
+		return result;
+	}
 }
