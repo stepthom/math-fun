@@ -388,4 +388,41 @@ public class MathFunction {
         }
         return xMin;
     }
+
+    public double definiteIntegral(double a, double b) {
+    	if (cachedIntegral == null) integrate();
+    	// a is lower, b is upper (but a <= b shouldn't be required)
+    	double min = a <= b ? cachedIntegral.findMinimum(a,b): cachedIntegral.findMinimum(b,a);
+    	double max = a <= b ? cachedIntegral.findMaximum(a,b): cachedIntegral.findMaximum(b,a);
+    	double minval = cachedIntegral.evaluate(min);
+    	double maxval = cachedIntegral.evaluate(max);
+    	if (Double.isInfinite(minval) || Double.isInfinite(minval)) return Double.NaN;
+    	if (Double.isNaN(minval) || Double.isNaN(maxval)) return Double.NaN;
+    	return cachedIntegral.evaluate(b) - cachedIntegral.evaluate(a);
+    }
+    
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null) return false;
+		if (!(o instanceof MathFunction)) return false;
+
+		MathFunction mf = (MathFunction) o;
+	
+		if (termsByExponent == null) {
+			if (mf.termsByExponent != null) return false;
+			else return true;
+		}
+		
+		return termsByExponent.equals(mf.termsByExponent);
+	}
+	
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		
+		int result = prime;
+		result += ((termsByExponent == null) ? 0 : termsByExponent.hashCode());
+		return result;
+	}
 }
