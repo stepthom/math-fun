@@ -15,7 +15,12 @@ public class Fraction implements Comparable<Fraction> {
 
     protected static final BigInteger bigZero   = BigInteger.valueOf(  0 );
     protected static final BigInteger bigOne    = BigInteger.valueOf(  1 );
-    
+
+	private static final BigInteger bigMinInt = BigInteger.valueOf( Integer.MIN_VALUE );
+	private static final BigInteger bigMaxInt = BigInteger.valueOf( Integer.MAX_VALUE );
+	private static final BigInteger bigMinLong = BigInteger.valueOf( Long.MIN_VALUE );
+	private static final BigInteger bigMaxLong = BigInteger.valueOf( Long.MAX_VALUE );
+
     
     public Fraction(BigInteger n, BigInteger d) {
     	int nSign = n.compareTo( bigZero );
@@ -163,26 +168,71 @@ public class Fraction implements Comparable<Fraction> {
         					this.denominator.multiply( f.denominator) );
     }
 
+    /**
+     * @param o The object against which this is compared.  Valid types for @c o are @c Fraction,
+     * @c Integer, @c Long, and @c BigInteger.  For the types other than @c Fraction, the provided  
+     * scalar value is taken to be the value of a whole number against which this Fraction is
+     * compared.  
+     */
     @Override
     public boolean equals(Object o) {
     	if (this == o) {
     		return true;
     	}
-    	
-    	if (! ( o instanceof Fraction)) {
-    		return false;
+    	else if (o instanceof Fraction) {
+        	// Try the cheap comparisons first...
+        	Fraction f = (Fraction) o;
+        	if (this.sign != f.sign) {
+        		return false;
+        	}
+        	    	
+        	// Every mathematically distinct fraction maps to a unique (numerator, denominator) pair,
+        	// thanks to this class's constructors...
+        	if (this.isWhole && f.isWhole) {
+        		return this.numerator.equals( f.numerator  );
+        	}
+        	else if (this.isWhole ^ f.isWhole) {
+        		return false;
+        	}
+        	else {
+        		return this.numerator  .equals(f.numerator  ) && 
+          			   this.denominator.equals(f.denominator);
+        	}
+    	}
+    	else if (o instanceof Integer) {
+    		if (! this.isWhole) {
+    			return false;
+    		}
+    		
+    		if ((numerator.compareTo(bigMinInt) == -1) || (numerator.compareTo(bigMaxInt) == 1)) {
+    			return false;
+    		}
+    		
+    		Integer i = (Integer) o;
+    	   	return numerator.intValue() == i.intValue();
+    	}
+    	else if (o instanceof Long) {
+    		if (! this.isWhole) {
+    			return false;
+    		}
+    		
+    		if ((numerator.compareTo(bigMinLong) == -1) || (numerator.compareTo(bigMaxLong) == 1)) {
+    			return false;
+    		}
+    		
+    		Long l = (Long) o;
+    	   	return numerator.longValue() == l.longValue();
+    	}    	
+    	else if (o instanceof BigInteger) {
+    		if (! this.isWhole) {
+    			return false;
+    		}
+    		
+    		BigInteger bi = (BigInteger) o;
+    	   	return numerator.equals( bi );
     	}
     	
-    	// Try the cheap comparisons before the expensive ones...
-    	Fraction f = (Fraction) o;
-    	if (this.sign != f.sign) {
-    		return false;
-    	}
-    	    	
-    	// Every mathematically distinct fraction maps to a unique (numerator, denominator) pair,
-    	// thanks to this class's constructors...
-    	return this.numerator  .equals(f.numerator  ) && 
-    		   this.denominator.equals(f.denominator);
+    	return false;
     }
 
     @Override

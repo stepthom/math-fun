@@ -91,37 +91,31 @@ public class FractionTest {
         // than Java's built-in 'double' type.
         MathContext mc = MathContext.DECIMAL128; 
         
-        //Assert.assertEquals(BAD_SUBTRACT_MSG, zero.subtract(oneThird).doubleValue(), oneThird.doubleValue() * -1.0, 0.0);
         Assert.assertEquals(BAD_SUBTRACT_MSG, 
         		            zero.subtract(oneThird).bigDecimalValue( mc ).doubleValue(), 
         		            oneThird.bigDecimalValue( mc ).doubleValue() * -1.0, 
         		            0.0);
         
-        //Assert.assertEquals(BAD_SUBTRACT_MSG, zero.subtract(smallNegative).doubleValue(), smallNegative.doubleValue() * -1.0, 0.0);
         Assert.assertEquals(BAD_SUBTRACT_MSG, 
         					zero.subtract(smallNegative).bigDecimalValue( mc ).doubleValue(), 
         					smallNegative.bigDecimalValue( mc ).doubleValue() * -1.0, 
         					0.0);
 
-        //Assert.assertEquals(BAD_SUBTRACT_MSG, oneThird.subtract(zero).doubleValue(), oneThird.doubleValue(), 0.0);
         Assert.assertEquals(BAD_SUBTRACT_MSG, 
         				    oneThird.subtract(zero).bigDecimalValue( mc ).doubleValue(), 
         				    oneThird.bigDecimalValue( mc ).doubleValue(), 
         				    0.0);
         
-        //Assert.assertEquals(BAD_SUBTRACT_MSG, oneThird.subtract(smallNegative).doubleValue(), oneThirdMinusSmallNegative.doubleValue(), 0.0);
         Assert.assertEquals(BAD_SUBTRACT_MSG, 
         					oneThird.subtract(smallNegative).bigDecimalValue( mc ).doubleValue(), 
         					oneThirdMinusSmallNegative.bigDecimalValue( mc ).doubleValue(), 
         					0.0);
         
-        //Assert.assertEquals(BAD_SUBTRACT_MSG, bigNegative.subtract(oneThird).doubleValue(), bigNegativeMinusOneThird.doubleValue(), 0.0);
         Assert.assertEquals(BAD_SUBTRACT_MSG, 
         					bigNegative.subtract(oneThird).bigDecimalValue( mc ).doubleValue(), 
         					bigNegativeMinusOneThird.bigDecimalValue( mc ).doubleValue(), 
         					0.0);
         
-        //Assert.assertEquals(BAD_SUBTRACT_MSG, smallNegative.subtract(bigNegative).doubleValue(), smallNegativeMinusBigNegative.doubleValue(), 0.0);
         Assert.assertEquals(BAD_SUBTRACT_MSG, 
         					smallNegative.subtract(bigNegative).bigDecimalValue( mc ).doubleValue(), 
         					smallNegativeMinusBigNegative.bigDecimalValue( mc ).doubleValue(), 
@@ -171,5 +165,38 @@ public class FractionTest {
     	Fraction potentialIntUnderflow = minNegIntFraction.multiply( new Fraction(2) );
     	Assert.assertEquals( BAD_CAN_HANDLE_BIG_NUMBERS_MSG,
     						 minNegIntFraction.compareTo( potentialIntUnderflow ), 1 );
+    }
+    
+    @Test
+    public void testEquals() {
+    	Fraction whole        = new Fraction( 2, 1 );
+    	Fraction notWhole     = new Fraction( 3, 4 );
+    	Fraction wholeVeryNeg = new Fraction( BigInteger.valueOf( Integer.MIN_VALUE - 1) );
+    	
+    	Assert.assertEquals   ( whole,    new Integer(2) );
+    	Assert.assertNotEquals( notWhole, new Integer(2) );
+    	Assert.assertNotEquals( whole,    new Integer(3) );
+    	
+    	Assert.assertEquals   ( whole,    new Long(2) );
+    	Assert.assertNotEquals( notWhole, new Long(2) );
+    	Assert.assertNotEquals( whole,    new Long(3) );
+    	
+    	Assert.assertEquals   ( whole,    BigInteger.valueOf(2) );
+    	Assert.assertNotEquals( notWhole, BigInteger.valueOf(2) );
+    	Assert.assertNotEquals( whole,    BigInteger.valueOf(3) );
+
+    	Assert.assertEquals   ( whole,    whole );
+    	Assert.assertEquals   ( whole,    new Fraction(2, 1) );
+    	Assert.assertEquals   ( whole,    new Fraction(4, 2) );
+    	Assert.assertEquals   ( notWhole, notWhole );
+    	Assert.assertNotEquals( whole,    notWhole );
+    	
+    	// These exercise value-specific code paths within Fraction.equals...
+    	Assert.assertNotEquals( wholeVeryNeg, Integer.MIN_VALUE );
+    	Assert.assertNotEquals( wholeVeryNeg, Long   .MIN_VALUE );
+
+    	// These are to make sure that false is returned, rather than an exception being thrown...
+    	Assert.assertNotEquals( whole, null );
+    	Assert.assertNotEquals( whole, new String("Hello, World!") );
     }
 }
