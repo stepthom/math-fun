@@ -1,5 +1,8 @@
 package com.swtanalytics.math;
 
+import java.math.MathContext;
+import java.util.Vector;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -163,9 +166,69 @@ public class MathFunctionTest {
     	
     	Assert.assertEquals( f3, f1.add( f2 ));
     }
+
+    private void checkFunctionForPoints( Vector<Fraction> points ) {    	
+    	// Confirm that we can construct the function.
+    	MathFunction f = new MathFunction( points );
+    	System.out.println("@@@ f = " + f);
+
+    	// Neville's method is constrained to producing polynomials whose terms have only
+    	// non-negative, integer exponents.
+    	int actualDegree = f.degree().intValue();
+    	
+    	int maxExpectedDegree = (points.size()/2) - 1;
+    	Assert.assertTrue( actualDegree >= 0 );
+    	Assert.assertTrue( actualDegree <= maxExpectedDegree );
+    	
+    	MathContext mc = MathContext.DECIMAL128;
+    	
+    	// This value was chosen simply because it seemed reasonable.
+    	final double epsilon = 1e-10; 
+    	
+    	for (int i = 0; i < (points.size()/2); ++i) {
+    		double x = points.elementAt(2*i).doubleValue(mc);
+    		double y_expected = points.elementAt((2*i) + 1).doubleValue(mc);
+    		double y_obtained = f.evaluate( x, mc );
+    		
+    		Assert.assertEquals(y_expected, y_obtained, epsilon);
+    	}
+    }
     
     @Test
     public void testFitPointsConstructor() {
-    	// TODO
+    	Vector<Fraction> points = new Vector<Fraction>();
+    	
+    	
+    	// Test a constant function.
+    	// (0, 42)
+    	points.clear();
+    	points.add( new Fraction(0) );
+    	points.add( new Fraction(42) );
+    	
+    	// (1, 42)
+    	points.add( new Fraction(1) );
+    	points.add( new Fraction(42) );
+    	
+    	checkFunctionForPoints( points );
+    	
+    	// TODO: Test a linear function.
+    	
+    	// TODO: Test a complicated function, by evaluating it at its defined points, and 
+    	// confirming its degree
+    }
+    
+    @Test(expected= java.lang.IllegalArgumentException.class)
+    public void testFitPointsConstructorRejectsDuplicateXValues() {
+    	Vector<Fraction> points = new Vector<Fraction>();
+    	
+    	// (0, 0)
+    	points.add( new Fraction(0) );
+    	points.add( new Fraction(0) );
+    	
+    	// (0, 1)
+    	points.add( new Fraction(0) );
+    	points.add( new Fraction(1) );
+
+    	new MathFunction( points );
     }
 }

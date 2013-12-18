@@ -22,6 +22,8 @@ public class MathFunction {
      * Generate a function which fits the specified set of points.
      * @param fit_points
      */
+    // @FIXME Modify this to take two parallel vectors: x, and y.  The x/y comingling should be
+    // undone by our cmdline parser (including checking for %2=0)
     public MathFunction( Vector<Fraction> fit_points ) {
         if ((fit_points.size() < 2) || ((fit_points.size() % 2) != 0)) {
             throw new IllegalArgumentException( "The fit points must be given as a non-empty" +
@@ -38,9 +40,20 @@ public class MathFunction {
         Integer[]      currentFuncsHighIdx       = new Integer     [ fit_points.size() / 2 ];
         Fraction[]     original_x_positions      = new Fraction    [ fit_points.size() / 2 ];
         
+        // Just used to verify that all x values are distinct... 
+        Set<Fraction> distinct_x_values = new TreeSet<Fraction>();
+        
         for (int i = 0; i < currentFuncs.length; ++i ) {
         	Fraction this_x = fit_points.elementAt(  2*i    );
         	Fraction this_y = fit_points.elementAt( (2*i)+1 );
+        	
+        	if (distinct_x_values.contains( this_x )) {
+        		throw new IllegalArgumentException( "All x values must be distinct.  The x value " +
+        			this_x + " appears more than once." );
+        	}
+        	else {
+        		distinct_x_values.add(this_x);
+        	}
 
         	// Through all rounds of Neville's function, we'll need to remember the original
         	// X position associated with each index.
@@ -106,6 +119,11 @@ public class MathFunction {
         	currentFuncsLowIdx  = newFuncsLowIdx;
         	currentFuncsHighIdx = newFuncsHighIdx;
         } // end while
+        
+        
+        this.termsByExponent = (TreeMap<Fraction, Term>) currentFuncs[0].termsByExponent.clone();
+        this.cachedDerivative = null;
+        this.cachedIntegral = null;
     }
 
     @Override
