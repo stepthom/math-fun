@@ -91,13 +91,7 @@ public class EasyMain {
                 if (fitPointStrings.length == 0) {
                     throw new CmdLineException(parser, 
                     		"Must have either -n with a positive integer, or specify a non-empty " +
-                    		"string for the -points option.");
-                }
-                
-                if ((fitPointStrings.length % 2) != 0) {
-                    throw new CmdLineException(parser, 
-                    		"-points must be followed by an even number of Fractions, because " +
-                    		"they come in (X_i, Y_i) pairs." );
+                    		"sequence of x and y fractions after the -points option.");
                 }
 
                 rawFitPointFractions = new Vector<Fraction>(fitPointStrings.length);
