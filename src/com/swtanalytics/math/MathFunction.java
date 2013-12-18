@@ -52,20 +52,10 @@ public class MathFunction {
     public MathFunction multiply( MathFunction otherFunc ) {
     	MathFunction prodFunc = new MathFunction();
 
-		System.out.println( "this      : " + this);
-		System.out.println( "otherFunc : " + otherFunc);
-
     	for ( Term thisTerm : this.termsByExponent.values() ) {
-    		System.out.println( "thisTerm : " + thisTerm );
-    		
         	for ( Term otherFuncTerm : otherFunc.termsByExponent.values() ) {
-        		System.out.println( "   otherFuncTerm : " + otherFuncTerm );
-        		
         		Term prodTerm = thisTerm.multiply( otherFuncTerm );
-        		System.out.println( "   prodTerm : " + prodTerm );
-        		
         		prodFunc.addTerm( prodTerm );
-           		System.out.println( "   prodFunc : " + prodFunc );
         	}
     	}
     	

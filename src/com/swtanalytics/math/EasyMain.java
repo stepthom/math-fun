@@ -2,10 +2,12 @@ package com.swtanalytics.math;
 
 import java.io.IOException;
 import java.math.MathContext;
+import java.util.Vector;
 
 import org.kohsuke.args4j.Option;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.CmdLineException;
+import org.kohsuke.args4j.spi.StringArrayOptionHandler;
 
 public class EasyMain {
     public static final int NUM_MATH_FUNCTIONS_DEFAULT = 10;
@@ -24,9 +26,33 @@ public class EasyMain {
     	DIFFERENTIAL,
     	INTEGRAL
     }
+    
+    protected enum FunctionGenerationMode
+    {
+    	RANDOM,
+    	FIT_POINTS
+    }
+    
+    private FunctionGenerationMode genMode = null;
+    
+    // Only meaningful when genMode == FIT_POINTS.  This is a sequence of the form 
+    // x_0, y_0 [, x_1, y_1, ...]
+    Vector<Fraction> rawFitPointFractions; 
 
     @Option(name="-n", usage="The number of functions to generate.")
     public int numMathFunctions = NUM_MATH_FUNCTIONS_DEFAULT;
+    
+    @Option(name = "-points", 
+    		usage="Generate only one function, which fits a specified set of points.\n" +
+    		       "This argument uses the form:\n" + 
+    				"   -points <x-frac1> <y-frac1> <x-frac2> <y-frac2> ...\n" +
+    			    "Each fraction has the form:\n" +
+    		        "   ['+'|'~']numerator['/'denominator]\n" + 
+    			    "where numerator and denominator are non-negative integers.  " +
+    		        "'~', not '-', indicates negation in this context.  " +
+    			    "At least two points must be specified.",
+    	    handler=StringArrayOptionHandler.class )
+    public String[] fitPointStrings;
 
     @Option(name="-d", usage="Print differentials too.")
     public boolean isPrintDifferential = false;
@@ -52,10 +78,45 @@ public class EasyMain {
             parser.parseArgument(args);
             // validate the input a bit.
             // There's probably a nicer way to do this with args4j
-            if (this.numMathFunctions <= 0) {
-                throw new CmdLineException(parser, "Option -n requires a positive integer");
+            
+            if (this.numMathFunctions < 0) {
+            	throw new CmdLineException(parser, "Option -n requires a non-negative integer");
             }
+            
+            // Issue #52 specifies that doing curve-fitting is mutually exclusive with generating a random set
+            // of functions.  There's probably a nicer way to get args4j to report / enforce the rule that 
+            // the command lines allows [-n | -points], but that's an enhancement we can look into later if
+            // we want to.  For now we'll just sniff for the default values being in effect...
+            if (this.numMathFunctions == 0) {
+                if (fitPointStrings.length == 0) {
+                    throw new CmdLineException(parser, 
+                    		"Must have either -n with a positive integer, or specify a non-empty " +
+                    		"string for the -points option.");
+                }
+                
+                if ((fitPointStrings.length % 2) != 0) {
+                    throw new CmdLineException(parser, 
+                    		"-points must be followed by an even number of Fractions, because " +
+                    		"they come in (X_i, Y_i) pairs." );
+                }
 
+                rawFitPointFractions = new Vector<Fraction>(fitPointStrings.length);
+                
+                for ( String p : fitPointStrings ) {
+                	Fraction f = new Fraction(p);
+                	rawFitPointFractions.add(f);
+                }
+                
+                genMode = FunctionGenerationMode.FIT_POINTS;
+            }
+            else {
+            	if (fitPointStrings.length > 0) {
+                    throw new CmdLineException(parser, 
+                    		"If using the -fit option, one must also use the '-n 0' option.");
+                }
+            	
+            	genMode = FunctionGenerationMode.RANDOM;
+            }
         } catch (CmdLineException e) {
             System.out.print(e.getMessage());
             System.out.print("\n");
@@ -179,11 +240,16 @@ public class EasyMain {
     	System.out.println("<functions>");
     	
     	MathContext mc = MathContext.DECIMAL128;
-    	
-    	for (int i=0; i<this.numMathFunctions;++i){
-            MathFunction mf = functionFactory.create(!this.isFractions, this.forceLinearFunctions);
-            printFunction(mf, i, mc);
-        }
+
+    	if (genMode == FunctionGenerationMode.RANDOM) {
+        	for (int i=0; i<this.numMathFunctions;++i){
+                MathFunction mf = functionFactory.create(!this.isFractions, this.forceLinearFunctions);
+                printFunction(mf, i, mc);
+            }
+    	}
+    	else {
+    		System.out.println( "TODO: generate and analyze the fitted function." );
+    	}
 
     	System.out.println("</functions>");
     }
