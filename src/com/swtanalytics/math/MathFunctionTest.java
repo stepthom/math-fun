@@ -141,4 +141,31 @@ public class MathFunctionTest {
     	MathFunction f1f3_computed = f1.multiply( f3 );
         Assert.assertEquals( f1f3_expected, f1f3_computed );
     }
+    
+    @Test 
+    public void testFunctionAdd() {
+    	// f1 = x^2 + (-3)x + 5
+    	MathFunction f1 = new MathFunction();
+    	f1.addTerm( new Term( new Fraction( 1), new Fraction(2 )) );
+    	f1.addTerm( new Term( new Fraction(-3), new Fraction(1 )) );
+    	f1.addTerm( new Term( new Fraction( 5), new Fraction(0 )) );
+
+    	// f2 = x + 7
+    	MathFunction f2 = new MathFunction();
+    	f2.addTerm( new Term( new Fraction( 1 ), new Fraction( 1 )) );
+    	f2.addTerm( new Term( new Fraction( 7 ), new Fraction( 0 )) );
+    	
+    	// f3 = x^2 + (-2)x + 12
+    	MathFunction f3 = new MathFunction();
+    	f3.addTerm( new Term( new Fraction( 1 ),  new Fraction( 2 )) );
+    	f3.addTerm( new Term( new Fraction( -2 ), new Fraction( 1 )) );
+    	f3.addTerm( new Term( new Fraction( 12 ), new Fraction( 0 )) );
+    	
+    	Assert.assertEquals( f3, f1.add( f2 ));
+    }
+    
+    @Test
+    public void testFitPointsConstructor() {
+    	// TODO
+    }
 }

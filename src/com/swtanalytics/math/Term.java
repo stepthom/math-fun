@@ -6,8 +6,8 @@ import java.math.MathContext;
 
 public class Term implements Comparable<Term> {
 
-    protected Fraction coefficient;
-    protected Fraction exponent;
+    protected final Fraction coefficient;
+    protected final Fraction exponent;
 
     public Term(Fraction c, Fraction e) {
         this.coefficient = c;

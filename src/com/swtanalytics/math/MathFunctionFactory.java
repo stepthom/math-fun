@@ -20,7 +20,7 @@ public class MathFunctionFactory {
         assert !firstTerm.coefficient.equals(new Fraction(0, 1));
         if (strictDegree)
         {
-            firstTerm.exponent = new Fraction(maxDegree, 1);
+        	firstTerm = new Term(firstTerm.coefficient, new Fraction(maxDegree, 1));
         }
         result.addTerm(firstTerm);
 

@@ -17,6 +17,96 @@ public class MathFunction {
 
     public MathFunction() {
     }
+    
+    /**
+     * Generate a function which fits the specified set of points.
+     * @param fit_points
+     */
+    public MathFunction( Vector<Fraction> fit_points ) {
+        if ((fit_points.size() < 2) || ((fit_points.size() % 2) != 0)) {
+            throw new IllegalArgumentException( "The fit points must be given as a non-empty" +
+            		"sequence of fractions, of the form x_1 y_1 [x_2 y_2 ...]" );
+        }
+        
+        // Use Neville's formula to generate the function.  Note that the Wikipedia article for
+        // Neville's function (as of this writing) uses an example in which the value of 'x' is
+        // known at the time Neville's algorithm executes.  Our task is slightly more complicated
+        // because we need to leave 'x' as a free variable.
+        
+        MathFunction[] currentFuncs              = new MathFunction[ fit_points.size() / 2 ];
+        Integer[]      currentFuncsLowIdx        = new Integer     [ fit_points.size() / 2 ];
+        Integer[]      currentFuncsHighIdx       = new Integer     [ fit_points.size() / 2 ];
+        Fraction[]     original_x_positions      = new Fraction    [ fit_points.size() / 2 ];
+        
+        for (int i = 0; i < currentFuncs.length; ++i ) {
+        	Fraction this_x = fit_points.elementAt(  2*i    );
+        	Fraction this_y = fit_points.elementAt( (2*i)+1 );
+
+        	// Through all rounds of Neville's function, we'll need to remember the original
+        	// X position associated with each index.
+        	original_x_positions[i] = this_x;
+        	
+        	// For the first round of Neville's algorithm, the functions are simply of the form 
+        	// f(x) = y_i = (this_y)*x^(0)
+        	MathFunction  f = new MathFunction();
+        	f.addTerm( new Term( this_y, 0 ));
+        	currentFuncs[i] = f;
+        	
+        	currentFuncsLowIdx[i] = i;
+        	currentFuncsHighIdx[i] = i;
+        }
+        
+        while (currentFuncs.length > 1) {
+        	MathFunction[] newFuncs        = new MathFunction[currentFuncs.length - 1];
+            Integer[]      newFuncsLowIdx  = new Integer     [currentFuncs.length - 1];
+            Integer[]      newFuncsHighIdx = new Integer     [currentFuncs.length - 1];
+        	
+        	for (int newFuncIdx = 0; newFuncIdx < newFuncs.length; ++newFuncIdx) {
+        		// Combine two current functions...
+        		int i = currentFuncsLowIdx [newFuncIdx  ];
+        		int j = currentFuncsHighIdx[newFuncIdx+1]; 
+        		
+        		MathFunction f1 = currentFuncs[newFuncIdx  ]; // p_{i, (j-1)}(x)
+        		MathFunction f2 = currentFuncs[newFuncIdx+1]; // p_{(i+1), j}(x)
+        		
+        		Fraction x_i = original_x_positions[ i ];
+        		Fraction x_j = original_x_positions[ j ];
+
+        		// fA(x) = (x_j - x) = (x_j)x^(0) + (-1)x^(1)
+        		MathFunction fA = new MathFunction();
+        		fA.addTerm(new Term( x_j, 0 ));
+        		fA.addTerm(new Term( -1 , 1 ));
+
+        		// fB(x) = (x - x_i) = (1)x^(1) + (-1 * x_i)x^(0)
+        		MathFunction fB = new MathFunction();
+        		fB.addTerm(new Term( 1           , 1 ));
+        		fB.addTerm(new Term( x_i.negate(), 0 ));
+        		
+        		// divisor = x_j - x_i
+        		// Model it as the function (x_j - x_i)x^(0), because then we can just use the
+        		// existing method MathFunction.multiply(...)
+        		MathFunction divisor_as_coeff = new MathFunction();
+        		Fraction divisor = x_j.add( x_i.negate() );
+        		divisor_as_coeff.addTerm(new Term( divisor.invert(), 0));
+        		
+        		// Assemble the final version of p_i_j
+        		MathFunction fA1 = fA.multiply(f1);
+        		MathFunction fB2 = fB.multiply(f2);
+        		MathFunction fA1_plus_fB2 = fA1.add( fB2 ); // TODO: MathFunction.add()
+        		
+        		MathFunction p_i_j = divisor_as_coeff.multiply( fA1_plus_fB2 );
+        		
+        		// Install the new function...
+        		newFuncs       [ newFuncIdx ] = p_i_j;
+        		newFuncsLowIdx [ newFuncIdx ] = i;
+        		newFuncsHighIdx[ newFuncIdx ] = j;
+        	} // end for
+        	
+        	currentFuncs        = newFuncs;
+        	currentFuncsLowIdx  = newFuncsLowIdx;
+        	currentFuncsHighIdx = newFuncsHighIdx;
+        } // end while
+    }
 
     @Override
     public boolean equals(Object o) {
@@ -60,6 +150,27 @@ public class MathFunction {
     	}
     	
     	return prodFunc;
+    }
+    
+    @SuppressWarnings("unchecked")
+	public MathFunction clone() {
+    	MathFunction c = new MathFunction();
+    	
+    	c.termsByExponent = (TreeMap<Fraction, Term>) this.termsByExponent.clone();
+    	c.cachedDerivative = (this.cachedDerivative == null) ? null : this.cachedDerivative.clone();
+    	c.cachedIntegral   = (this.cachedIntegral   == null) ? null : this.cachedIntegral.clone();
+    	
+    	return c;
+    }
+    
+    public MathFunction add( MathFunction otherFunc ) {
+    	MathFunction sum = this.clone();
+    	
+    	for ( Term otherFuncTerm : otherFunc.termsByExponent.values() ) {
+    		sum.addTerm( otherFuncTerm );
+    	}
+    	
+    	return sum;
     }
 
     public void addTerm(Term t) {
